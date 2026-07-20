@@ -25,6 +25,8 @@ Messages:
   command-gmusic-paused-error: "[P]&c There is currently no paused song!"
   command-gmusic-pause: "[P]&a Song paused."
   command-gmusic-resume: "[P]&a Song resumed."
+  command-gmusic-toggle-enabled: "[P]&a Music enabled."
+  command-gmusic-toggle-disabled: "[P]&a Music disabled."
 
   command-gadminmusic-use-error: "[P]&c /adminmusic jukebox|disc|download|radio|edit|play|playing|random|stop|pause|resume|skip|toggle"
   command-gadminmusic-target-error: "[P]&6 %Target%&c is not a valid target!"
