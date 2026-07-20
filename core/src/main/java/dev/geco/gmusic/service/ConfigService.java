@@ -19,6 +19,7 @@ public class ConfigService {
     public boolean CHECK_FOR_UPDATE;
     public boolean S_EXTENDED_RANGE;
     public boolean S_FORCE_RESOURCES;
+    public boolean LOCATIONAL_JUKEBOX_SOUNDS;
     public int JUKEBOX_RANGE;
     public int MAX_JUKEBOX_RANGE;
     public boolean A_SHOW_MESSAGES;
@@ -34,6 +35,7 @@ public class ConfigService {
     public boolean PS_SAVE_ON_QUIT;
     public int PS_D_PLAYLIST_MODE;
     public int PS_D_VOLUME;
+    public boolean PS_D_STEREO;
     public boolean PS_D_JOIN;
     public int PS_D_PLAY_MODE;
     public boolean PS_D_PARTICLES;
@@ -81,6 +83,7 @@ public class ConfigService {
         S_EXTENDED_RANGE = gMusicMain.getConfig().getBoolean("Options.Sound.extened-range", true);
         S_FORCE_RESOURCES = gMusicMain.getConfig().getBoolean("Options.Sound.force-resources", true);
 
+        LOCATIONAL_JUKEBOX_SOUNDS = gMusicMain.getConfig().getBoolean("Options.locational-jukebox-sounds", true);
         JUKEBOX_RANGE = gMusicMain.getConfig().getInt("Options.jukebox-range", 50);
         MAX_JUKEBOX_RANGE = gMusicMain.getConfig().getInt("Options.max-jukebox-range", 500);
 
@@ -100,6 +103,7 @@ public class ConfigService {
         PS_SAVE_ON_QUIT = gMusicMain.getConfig().getBoolean("Options.PlayerSettings.save-on-quit", true);
         PS_D_PLAYLIST_MODE = gMusicMain.getConfig().getInt("Options.PlayerSettings.Default.playlist-mode", 0);
         PS_D_VOLUME = gMusicMain.getConfig().getInt("Options.PlayerSettings.Default.volume", 70);
+        PS_D_STEREO = gMusicMain.getConfig().getBoolean("Options.PlayerSettings.Default.stereo", true);
         PS_D_JOIN = gMusicMain.getConfig().getBoolean("Options.PlayerSettings.Default.join", false);
         PS_D_PLAY_MODE = gMusicMain.getConfig().getInt("Options.PlayerSettings.Default.play-mode", 0);
         PS_D_PARTICLES = gMusicMain.getConfig().getBoolean("Options.PlayerSettings.Default.particles", false);

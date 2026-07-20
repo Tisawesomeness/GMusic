@@ -99,7 +99,7 @@ public class PlayService {
 						if(notePart.getSound() != null) {
 							float volume = playSettings.getFixedVolume() * notePart.getVolume();
 
-							Location location = notePart.getDistance() == 0 ? player.getEyeLocation() : gMusicMain.getSteroNoteUtil().convertToStero(player.getEyeLocation(), notePart.getDistance());
+							Location location = playSettings.isStereo() || notePart.getDistance() == 0 ? player.getEyeLocation() : gMusicMain.getSteroNoteUtil().convertToStero(player.getEyeLocation(), notePart.getDistance());
 
 							if(!gMusicMain.getConfigService().ENVIRONMENT_EFFECTS) player.playSound(location, notePart.getSound(), song.getSoundCategory(), volume, notePart.getPitch());
 							else {

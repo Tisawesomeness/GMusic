@@ -8,6 +8,7 @@ public class PlaySettings {
 	private final UUID uuid;
 	private PlayListMode playlistMode;
 	private int volume;
+	private boolean stereo;
 	private boolean playOnJoin;
 	private PlayMode playMode;
 	private boolean showParticles;
@@ -21,6 +22,7 @@ public class PlaySettings {
 			UUID uuid,
 			PlayListMode playlistMode,
 			int volume,
+			boolean stereo,
 			boolean playOnJoin,
 			PlayMode playMode,
 			boolean showParticles,
@@ -33,6 +35,7 @@ public class PlaySettings {
 		this.uuid = uuid;
 		this.playlistMode = playlistMode;
 		this.volume = volume;
+		this.stereo = stereo;
 		this.playOnJoin = playOnJoin;
 		this.playMode = playMode;
 		this.showParticles = showParticles;
@@ -54,6 +57,10 @@ public class PlaySettings {
 	public float getFixedVolume() { return (float) (volume * 2) / 100; }
 
 	public void setVolume(int volume) { this.volume = volume; }
+
+	public boolean isStereo() { return stereo; }
+
+	public void setStereo(boolean stereo) { this.stereo = stereo; }
 
 	public boolean isPlayOnJoin() { return playOnJoin; }
 

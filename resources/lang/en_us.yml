@@ -85,6 +85,7 @@ MusicGUI:
 
   music-options: "&cOptions"
   music-options-volume: "&aVolume:&b %Volume%%"
+  music-options-stereo: "&aStereo:&6 %Stereo%"
   music-options-join: "&aWelcome music:&6 %Join%"
   music-options-play-mode-once: "&aMode:&6 Once"
   music-options-play-mode-shuffle: "&aMode:&6 Shuffle"

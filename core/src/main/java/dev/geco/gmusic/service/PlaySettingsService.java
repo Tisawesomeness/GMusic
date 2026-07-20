@@ -28,6 +28,7 @@ public class PlaySettingsService {
 	public void createDataTables() {
 		try {
 			gMusicMain.getDataService().execute("CREATE TABLE IF NOT EXISTS gmusic_play_settings (uuid TEXT, playListMode INTEGER, volume INTEGER, playOnJoin INTEGER, playMode INTEGER, showParticles INTEGER, reverseMode INTEGER, toggleMode INTEGER, range INTEGER, currentSong TEXT);");
+			gMusicMain.getDataService().execute("CREATE TABLE IF NOT EXISTS gmusic_play_settings_stereo (uuid TEXT, stereo INTEGER);");
 			gMusicMain.getDataService().execute("CREATE TABLE IF NOT EXISTS gmusic_play_settings_favorites (uuid TEXT, songId TEXT);");
 		} catch(Throwable e) { gMusicMain.getLogger().log(Level.SEVERE, "Could not create play settings database tables!", e); }
 	}
@@ -36,6 +37,7 @@ public class PlaySettingsService {
 		if(playSettingsCache.containsKey(uuid)) return playSettingsCache.get(uuid);
 
 		List<Song> favorites = new ArrayList<>();
+		boolean stereo = true;
 
 		PlaySettings playSettings = null;
 
@@ -46,12 +48,19 @@ public class PlaySettingsService {
 				}
 			}
 
+			try(ResultSet playSettingsStereoData = gMusicMain.getDataService().executeAndGet("SELECT * FROM gmusic_play_settings_stereo WHERE uuid = ?", uuid.toString())) {
+				if(playSettingsStereoData.next()) {
+					stereo = playSettingsStereoData.getBoolean("stereo");
+				}
+			}
+
 			try(ResultSet playSettingsData = gMusicMain.getDataService().executeAndGet("SELECT * FROM gmusic_play_settings WHERE uuid = ?", uuid.toString())) {
 				if(playSettingsData.next()) {
 					playSettings = new PlaySettings(
 							uuid,
 							PlayListMode.byId(playSettingsData.getInt("playListMode")),
 							playSettingsData.getInt("volume"),
+							stereo,
 							playSettingsData.getBoolean("playOnJoin"),
 							PlayMode.byId(playSettingsData.getInt("playMode")),
 							playSettingsData.getBoolean("showParticles"),
@@ -78,6 +87,7 @@ public class PlaySettingsService {
 				uuid,
 				PlayListMode.byId(gMusicMain.getConfigService().PS_D_PLAYLIST_MODE),
 				gMusicMain.getConfigService().PS_D_VOLUME,
+				gMusicMain.getConfigService().PS_D_STEREO,
 				gMusicMain.getConfigService().R_PLAY_ON_JOIN,
 				PlayMode.byId(gMusicMain.getConfigService().PS_D_PLAY_MODE),
 				gMusicMain.getConfigService().PS_D_PARTICLES,
@@ -96,6 +106,7 @@ public class PlaySettingsService {
 	public void savePlaySettings(@NotNull UUID uuid, @Nullable PlaySettings playSettings) {
 		try {
 			gMusicMain.getDataService().execute("DELETE FROM gmusic_play_settings WHERE uuid = ?", uuid.toString());
+			gMusicMain.getDataService().execute("DELETE FROM gmusic_play_settings_stereo WHERE uuid = ?", uuid.toString());
 			gMusicMain.getDataService().execute("DELETE FROM gmusic_play_settings_favorites WHERE uuid = ?", uuid.toString());
 
 			if(playSettings == null) {
@@ -116,6 +127,11 @@ public class PlaySettingsService {
 					playSettings.isToggleMode(),
 					playSettings.getRange(),
 					playSettings.getCurrentSong()
+			);
+
+			gMusicMain.getDataService().execute("INSERT INTO gmusic_play_settings_stereo (uuid, stereo) VALUES (?, ?)",
+					uuid.toString(),
+					playSettings.isStereo()
 			);
 
 			if(playSettings.getFavorites().isEmpty()) return;

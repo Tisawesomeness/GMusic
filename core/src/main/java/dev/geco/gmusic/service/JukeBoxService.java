@@ -226,7 +226,7 @@ public class JukeBoxService {
 							if(notePart.getSound() != null) {
 								float volume = (float) ((playersInRange.get(player) - playSettings.getRange()) * playSettings.getFixedVolume() / (double) -playSettings.getRange()) * notePart.getVolume();
 
-								Location location = notePart.getDistance() == 0 ? player.getEyeLocation() : gMusicMain.getSteroNoteUtil().convertToStero(player.getEyeLocation(), notePart.getDistance());
+								Location location = gMusicMain.getConfigService().LOCATIONAL_JUKEBOX_SOUNDS ? boxLocation : notePart.getDistance() == 0 ? player.getEyeLocation() : gMusicMain.getSteroNoteUtil().convertToStero(player.getEyeLocation(), notePart.getDistance());
 
 								if(!gMusicMain.getConfigService().ENVIRONMENT_EFFECTS) player.playSound(location, notePart.getSound(), song.getSoundCategory(), volume, notePart.getPitch());
 								else {
