@@ -30,10 +30,7 @@ import org.bukkit.util.ChatPaginator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 
 public class MusicGUI {
@@ -481,6 +478,7 @@ public class MusicGUI {
 			songs = playSettings.getPlayListMode() == PlayListMode.FAVORITES ? playSettings.getFavorites() : gMusicMain.getSongService().getSongs();
 			if(searchKey != null && !searchKey.isEmpty()) songs = gMusicMain.getSongService().filterSongsBySearch(songs, searchKey);
 		}
+		songs.sort(Comparator.comparing(Song::getTitle));
 
 		if(newPage > getMaxPageSize(songs.size())) newPage = getMaxPageSize(songs.size());
 		if(newPage < 1) newPage = 1;
