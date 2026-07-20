@@ -21,9 +21,19 @@ public class NotePart {
 
 		String[] parts = notePartString.split(PARTS);
 
-		if(!parts[0].startsWith(STOP)) sound = this.note.getSong().getInstruments().get(parts[0]);
-		else stopSound = this.note.getSong().getInstruments().get(parts[0].replace(STOP, ""));
-		if(sound == null || stopSound != null) return;
+		Instrument instrument;
+		if(!parts[0].startsWith(STOP)) {
+			instrument = this.note.getSong().getInstruments().get(parts[0]);
+			if(instrument == null) return;
+			sound = instrument.getSound();
+			int idx = sound.lastIndexOf('/');
+			if(idx >= 0) sound = sound.substring(idx + 1);
+		} else {
+			instrument = this.note.getSong().getInstruments().get(parts[0].replace(STOP, ""));
+			if(instrument == null) return;
+			stopSound = instrument.getSound();
+			return;
+		}
 
 		if(parts.length == 1 || parts[1].equals(VAR)) {
 			volume = 1f;
@@ -34,9 +44,9 @@ public class NotePart {
 		if(parts.length > 2 && !parts[2].equals(VAR)) {
 			if(parts[2].contains(KEYFLOAT)) {
 				int noteKey = Integer.parseInt(parts[2].replace(KEYFLOAT, ""));
-				pitch = getPitch(noteKey);
-				originalPitch = getOriginalPitch(noteKey);
-				if(GMusicMain.getInstance().getConfigService().S_EXTENDED_RANGE) {
+				pitch = getPitch(noteKey, instrument);
+				originalPitch = getOriginalPitch(noteKey, instrument);
+				if(!instrument.isCustom() && GMusicMain.getInstance().getConfigService().S_EXTENDED_RANGE) {
 					if(originalPitch >= 48) {
 						sound += "_2";
 					} else if(originalPitch >= 24) {
@@ -56,8 +66,9 @@ public class NotePart {
 		if(parts.length > 3) distance = ((Integer.parseInt(parts[3]) - 100) / 200f) * 2f;
 	}
 
-	private float getPitch(int note) {
-		if(!GMusicMain.getInstance().getConfigService().S_EXTENDED_RANGE) {
+	private float getPitch(int note, Instrument instrument) {
+		note += (instrument.getInstrumentKey() - 12);
+		if(instrument.isCustom() || !GMusicMain.getInstance().getConfigService().S_EXTENDED_RANGE) {
 			if(note < 0) return 0.5f;
 			if(note > 24) return 2f;
 			return (float) Math.pow(2, ((float) (note - 12) / 12));
@@ -78,8 +89,9 @@ public class NotePart {
 		return (float) Math.pow(2, ((float) (note - 12) / 12));
 	}
 
-	private int getOriginalPitch(int note) {
-		if(!GMusicMain.getInstance().getConfigService().S_EXTENDED_RANGE) {
+	private int getOriginalPitch(int note, Instrument instrument) {
+		note += (instrument.getInstrumentKey() - 12);
+		if(instrument.isCustom() || !GMusicMain.getInstance().getConfigService().S_EXTENDED_RANGE) {
 			if(note < 0) return 0;
 			return Math.min(note, 24);
 		}
