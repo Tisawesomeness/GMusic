@@ -140,6 +140,11 @@ public class GMusicCommand implements CommandExecutor {
                 }
                 PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(player.getUniqueId());
                 playSettings.setToggleMode(!playSettings.isToggleMode());
+                if(playSettings.isToggleMode()) {
+                    gMusicMain.getMessageService().sendMessage(sender, "Messages.command-gmusic-toggle-disabled");
+                } else {
+                    gMusicMain.getMessageService().sendMessage(sender, "Messages.command-gmusic-toggle-enabled");
+                }
             }
             default -> gMusicMain.getMessageService().sendMessage(sender, "Messages.command-gmusic-use-error");
         }
