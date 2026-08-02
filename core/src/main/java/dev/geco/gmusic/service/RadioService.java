@@ -196,15 +196,6 @@ public class RadioService {
 		}, 0, 1);
 	}
 
-	public void stopRadio() {
-		PlayState playState = gMusicMain.getPlayService().getPlayState(RADIO_UUID);
-		if(playState == null) return;
-
-		playState.getTimer().cancel();
-
-		gMusicMain.getPlayService().removePlayState(RADIO_UUID);
-	}
-
 	public Song getNextSong() {
 		PlayState playState = gMusicMain.getPlayService().getPlayState(RADIO_UUID);
 		return playState != null ? gMusicMain.getPlayService().getShuffleSong(RADIO_UUID, playState.getSong(), PlayType.RADIO) : gMusicMain.getPlayService().getRandomSong(RADIO_UUID, PlayType.RADIO);
@@ -216,7 +207,7 @@ public class RadioService {
 
 		playState.getTimer().cancel();
 
-		gMusicMain.getPlayService().removePlayState(RADIO_UUID);
+		gMusicMain.getPlayService().clearPlayState(RADIO_UUID);
 
 		if(gMusicMain.getConfigService().A_SHOW_MESSAGES) {
 			Set<Player> players = new HashSet<>(radioPlayers);

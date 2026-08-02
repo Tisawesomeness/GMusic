@@ -74,7 +74,7 @@ public class JukeBoxService {
 
 	public void removeTemporaryJukeBoxBlock(@NotNull UUID uuid) { jukeBoxes.remove(uuid); }
 
-	public void loadJukeboxes(@Nullable World world) {
+	public void loadJukeboxes() {
 		jukeBoxBlocks.clear();
 		jukeBoxes.clear();
 		gMusicMain.getTaskService().runDelayed(() -> {
@@ -83,7 +83,7 @@ public class JukeBoxService {
 					while(jukeBoxData.next()) {
 						String worldName = jukeBoxData.getString("world");
 						World jukeBoxWorld = Bukkit.getWorld(worldName);
-						if(jukeBoxWorld == null || (world != null && world.equals(jukeBoxWorld))) continue;
+						if(jukeBoxWorld == null) continue;
 
 						Location location = new Location(jukeBoxWorld, jukeBoxData.getInt("x"), jukeBoxData.getInt("y"), jukeBoxData.getInt("z"));
 
@@ -112,6 +112,11 @@ public class JukeBoxService {
 		}, 0);
 	}
 
+	public void unloadJukeboxes() {
+		jukeBoxBlocks.clear();
+		jukeBoxes.clear();
+	}
+
 	public void setJukebox(@NotNull Block block) {
 		try {
 			UUID uuid = UUID.randomUUID();
@@ -135,7 +140,8 @@ public class JukeBoxService {
 		UUID uuid = jukeBoxBlocks.get(block);
 		if(uuid == null) return;
 		stopBoxSong(uuid);
-		gMusicMain.getPlaySettingsService().savePlaySettings(uuid, null);
+		gMusicMain.getPlayService().removePlayState(uuid);
+		gMusicMain.getPlaySettingsService().removePlaySettings(uuid);
 		MusicGUI.getMusicGUI(uuid).close(true);
 		gMusicMain.getRadioService().removeRadioJukeBox(uuid);
 		jukeBoxBlocks.remove(block);
@@ -243,7 +249,7 @@ public class JukeBoxService {
 
 						if(playSettings.getPlayMode() == PlayMode.SHUFFLE && playSettings.getPlayListMode() != PlayListMode.RADIO) playBoxSong(uuid, gMusicMain.getPlayService().getShuffleSong(uuid, song, PlayType.JUKEBOX), gMusicMain.getConfigService().PS_TIME_UNTIL_SHUFFLE);
 						else {
-							gMusicMain.getPlayService().removePlayState(uuid);
+							gMusicMain.getPlayService().clearPlayState(uuid);
 							MusicGUI m = MusicGUI.getMusicGUI(uuid);
 							if(m != null) m.setPauseResumeBar();
 						}
@@ -278,7 +284,7 @@ public class JukeBoxService {
 
 		playState.getTimer().cancel();
 
-		gMusicMain.getPlayService().removePlayState(uuid);
+		gMusicMain.getPlayService().clearPlayState(uuid);
 
 		if(gMusicMain.getConfigService().A_SHOW_MESSAGES) {
 			Block block = jukeBoxes.get(uuid);

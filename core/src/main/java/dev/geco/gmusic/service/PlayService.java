@@ -17,6 +17,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,13 +46,17 @@ public class PlayService {
 
 	public void loadPlayStates() {
 		playStateCache.clear();
+		List<String> uuidsToDelete = new ArrayList<>();
 		try {
 			try(ResultSet playStateData = gMusicMain.getDataService().executeAndGet("SELECT * FROM gmusic_play_state")) {
 				while(playStateData.next()) {
-					Song song = gMusicMain.getSongService().getSongById(playStateData.getString("song_id"));
-					if(song == null) continue;
-
 					UUID uuid = UUID.fromString(playStateData.getString("uuid"));
+
+					Song song = gMusicMain.getSongService().getSongById(playStateData.getString("song_id"));
+					if(song == null) {
+						uuidsToDelete.add(uuid.toString());
+						continue;
+					}
 
 					PlayState playState = new PlayState(
 							uuid,
@@ -67,14 +73,19 @@ public class PlayService {
 						if(player == null) continue;
 						playStateCache.put(uuid, playState);
 						if(!playState.isPaused()) gMusicMain.getPlayService().playSong(player, playState.getSong(), -playState.getTickPosition());
+						uuidsToDelete.add(uuid.toString());
 						continue;
 					}
 
 					playStateCache.put(uuid, playState);
+					uuidsToDelete.add(uuid.toString());
 				}
 			}
 
-			gMusicMain.getDataService().execute("DELETE FROM gmusic_play_state;");
+			if(!uuidsToDelete.isEmpty()) {
+				String placeholders = String.join(",", Collections.nCopies(uuidsToDelete.size(), "?"));
+				gMusicMain.getDataService().execute("DELETE FROM gmusic_play_state WHERE uuid IN (" + placeholders + ");", uuidsToDelete.toArray());
+			}
 		} catch(Throwable e) { gMusicMain.getLogger().log(Level.SEVERE, "Could not load play states", e); }
 	}
 
@@ -195,7 +206,10 @@ public class PlayService {
 			try(ResultSet playStateData = gMusicMain.getDataService().executeAndGet("SELECT * FROM gmusic_play_state WHERE uuid = ?", uuid.toString())) {
 				while(playStateData.next()) {
 					Song song = gMusicMain.getSongService().getSongById(playStateData.getString("song_id"));
-					if(song == null) continue;
+					if(song == null) {
+						gMusicMain.getDataService().execute("DELETE FROM gmusic_play_state WHERE uuid = ?;", uuid.toString());
+						continue;
+					}
 
 					playState = new PlayState(
 							uuid,
@@ -204,6 +218,8 @@ public class PlayService {
 							new Timer(),
 							playStateData.getLong("tick")
 					);
+
+					gMusicMain.getDataService().execute("DELETE FROM gmusic_play_state WHERE uuid = ?;", uuid.toString());
 				}
 			}
 		} catch(Throwable e) { gMusicMain.getLogger().log(Level.SEVERE, "Could not load play state", e); }
@@ -212,6 +228,8 @@ public class PlayService {
 
 		return playState;
 	}
+
+	public void clearPlayState(@NotNull UUID uuid) { playStateCache.put(uuid, null); }
 
 	public void removePlayState(@NotNull UUID uuid) { playStateCache.remove(uuid); }
 
@@ -234,7 +252,7 @@ public class PlayService {
 		return playState != null ? getShuffleSong(player.getUniqueId(), playState.getSong(), PlayType.DEFAULT) : getRandomSong(player.getUniqueId(), PlayType.DEFAULT);
 	}
 
-	public void savePlaySettings(@NotNull UUID uuid, @NotNull PlayState playState) {
+	public void savePlayState(@NotNull UUID uuid, @NotNull PlayState playState) {
 		try {
 			String sql = switch(gMusicMain.getDataService().getType()) {
 				case "sqlite" -> """
@@ -281,11 +299,13 @@ public class PlayService {
 		} catch(Throwable e) { gMusicMain.getLogger().log(Level.SEVERE, "Could not save play state", e); }
 	}
 
-	public void stopSongs() {
+	public void savePlayStates() {
 		for(Map.Entry<UUID, PlayState> playState : playStateCache.entrySet()) {
+			if(playState.getValue() == null) continue;
+
 			playState.getValue().getTimer().cancel();
 
-			savePlaySettings(playState.getKey(), playState.getValue());
+			savePlayState(playState.getKey(), playState.getValue());
 
 			Player player = Bukkit.getPlayer(playState.getKey());
 			if(player != null && gMusicMain.getConfigService().A_SHOW_MESSAGES) gMusicMain.getMessageService().sendActionBarMessage(player, "Messages.actionbar-stop");

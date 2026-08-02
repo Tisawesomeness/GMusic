@@ -190,7 +190,7 @@ public class GMusicMain extends JavaPlugin {
         jukeBoxService.createDataTables();
         playService.loadPlayStates();
         playSettingsService.loadPlaySettings();
-        jukeBoxService.loadJukeboxes(null);
+        jukeBoxService.loadJukeboxes();
         if(configService.R_ACTIVE) radioService.startRadio();
     }
 
@@ -212,10 +212,10 @@ public class GMusicMain extends JavaPlugin {
 
     private void unload() {
         dataService.close();
-        playService.stopSongs();
-        radioService.stopRadio();
-        songService.unloadSongs();
+        playService.savePlayStates();
         playSettingsService.savePlaySettings();
+        songService.unloadSongs();
+        jukeBoxService.unloadJukeboxes();
 
         if(placeholderAPILink != null) placeholderAPILink.unregister();
         if(worldGuardLink != null) worldGuardLink.unregisterFlagHandlers();

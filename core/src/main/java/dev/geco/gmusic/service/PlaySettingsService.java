@@ -206,6 +206,14 @@ public class PlaySettingsService {
 		} catch(Throwable e) { gMusicMain.getLogger().log(Level.SEVERE, "Could not save play settings", e); }
 	}
 
+	public void removePlaySettings(@NotNull UUID uuid) {
+		try {
+			removePlaySettingsCache(uuid);
+			gMusicMain.getDataService().execute("DELETE FROM gmusic_play_setting WHERE uuid = ?", uuid.toString());
+			gMusicMain.getDataService().execute("DELETE FROM gmusic_play_setting_favorite WHERE uuid = ?", uuid.toString());
+		} catch(Throwable e) { gMusicMain.getLogger().log(Level.SEVERE, "Could not remove play settings", e); }
+	}
+
 	public void savePlaySettings() {
 		for(Map.Entry<UUID, PlaySettings> playSettings : playSettingsCache.entrySet()) {
 			savePlaySettings(playSettings.getKey(), playSettings.getValue());

@@ -68,7 +68,7 @@ public class PlayerEventHandler implements Listener {
 
         if(gMusicMain.getConfigService().PS_SAVE_ON_QUIT) {
             PlayState playState = gMusicMain.getPlayService().getPlayState(playerUuid);
-            if(playState != null) gMusicMain.getPlayService().savePlaySettings(playerUuid, playState);
+            if(playState != null) gMusicMain.getPlayService().savePlayState(playerUuid, playState);
 
             PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(playerUuid, PlayType.DEFAULT);
             gMusicMain.getPlaySettingsService().savePlaySettings(playerUuid, playSettings);
