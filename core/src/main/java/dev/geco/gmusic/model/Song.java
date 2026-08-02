@@ -21,15 +21,15 @@ public class Song {
 	private final List<String> description;
 	private Material discMaterial;
 	private SoundCategory soundCategory;
-	private final HashMap<String, String> instruments = new HashMap<>();
+	private final HashMap<String, Instrument> instruments = new HashMap<>();
 	private final HashMap<String, List<Note>> parts = new HashMap<>();
 	private final List<Note> notes = new ArrayList<>();
 	private final HashMap<Long, List<NotePart>> content = new HashMap<>();
 	private long noteAmount = 0;
 	private long length = 0;
 
-    public Song(File gnbsFile) {
-        YamlConfiguration config = YamlConfiguration.loadConfiguration(gnbsFile);
+	public Song(File gnbsFile) {
+		YamlConfiguration config = YamlConfiguration.loadConfiguration(gnbsFile);
 		filename = gnbsFile.getName();
 
 		id = config.getString("Song.Id");
@@ -48,14 +48,18 @@ public class Song {
 		try { songInstruments.addAll(config.getConfigurationSection("Song.Content.Instruments").getKeys(false)); } catch(Throwable ignored) { }
 		for(String songInstrument : songInstruments) {
 			try {
-				String noteInstrument = NoteInstrument.getIdSound(Integer.parseInt(config.getString("Song.Content.Instruments." + songInstrument, "-1")));
+				NoteInstrument noteInstrument = NoteInstrument.fromId(Integer.parseInt(config.getString("Song.Content.Instruments." + songInstrument, "-1")));
 				if(noteInstrument != null) instruments.put(songInstrument, noteInstrument);
 				else throw new IllegalArgumentException();
-			} catch(IllegalArgumentException e) { instruments.put(songInstrument, config.getString("Song.Content.Instruments." + songInstrument)); }
+			} catch(IllegalArgumentException e) {
+				String sound = config.getString("Song.Content.Instruments." + songInstrument);
+				int key = config.getInt("Song.Content.InstrumentKeys." + songInstrument, 12);
+				instruments.put(songInstrument, new CustomInstrument(sound, key));
+			}
 		}
 		for(NoteInstrument inst : NoteInstrument.values()) {
 			if(instruments.containsKey("" + inst.getId())) continue;
-			instruments.put("" + inst.getId(), inst.getSound());
+			instruments.put("" + inst.getId(), inst);
 		}
 
 		List<String> songParts = new ArrayList<>();
@@ -122,7 +126,7 @@ public class Song {
 
 	public SoundCategory getSoundCategory() { return soundCategory; }
 
-	public HashMap<String, String> getInstruments() { return instruments; }
+	public HashMap<String, Instrument> getInstruments() { return instruments; }
 
 	public HashMap<String, List<Note>> getParts() { return parts; }
 

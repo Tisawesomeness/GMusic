@@ -1,6 +1,7 @@
 package dev.geco.gmusic.service.converter;
 
 import dev.geco.gmusic.GMusicMain;
+import dev.geco.gmusic.model.CustomInstrument;
 import dev.geco.gmusic.model.NoteInstrument;
 import dev.geco.gmusic.service.SongService;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -28,10 +29,11 @@ public class NBSConverter {
 
 			short type = readShort(dataInput);
 			int version = 0;
+			byte defaultInstruments = 10;
 
 			if(type == 0) {
 				version = dataInput.readByte();
-				dataInput.readByte();
+				defaultInstruments = dataInput.readByte();
 				if(version >= 3) readShort(dataInput);
 			}
 
@@ -127,12 +129,13 @@ public class NBSConverter {
 
 			byte midiInstrumentsLength = dataInput.readByte();
 
-			List<String> midiInstruments = new ArrayList<>();
+			List<CustomInstrument> midiInstruments = new ArrayList<>();
 
 			for(int instrumentCount = 0; instrumentCount < midiInstrumentsLength; instrumentCount++) {
 				readString(dataInput);
-				midiInstruments.add(readString(dataInput).replace(".ogg", ""));
-				dataInput.readByte();
+				String sound = readString(dataInput).replace(".ogg", "");
+				byte key = dataInput.readByte();
+				midiInstruments.add(new CustomInstrument(sound, ((int) key) - 33));
 				dataInput.readByte();
 			}
 
@@ -144,16 +147,26 @@ public class NBSConverter {
 
 			YamlConfiguration gnbsStruct = YamlConfiguration.loadConfiguration(gnbsFile);
 
-			gnbsStruct.set("Song.Id", title.replace(" ", ""));
+			String id = title.replace(" ", "");
+			gnbsStruct.set("Song.Id", id);
 			gnbsStruct.set("Song.Title", title);
 			gnbsStruct.set("Song.OriginalAuthor", originalAuthor);
 			gnbsStruct.set("Song.Author", author);
 			gnbsStruct.set("Song.Description", description.replace(" ", "").isEmpty() ? new ArrayList<>() : Arrays.asList(description.split("\n")));
 			gnbsStruct.set("Song.Category", "RECORDS");
 
-			for(NoteInstrument inst : NoteInstrument.values()) if(gnbsInstruments.contains(inst.getId())) gnbsStruct.set("Song.Content.Instruments." + inst.getId(), inst.getId());
+			for(NoteInstrument inst : NoteInstrument.values()) if(inst.getId() < defaultInstruments && gnbsInstruments.contains(inst.getId())) gnbsStruct.set("Song.Content.Instruments." + inst.getId(), inst.getId());
 
-			for(int instrument = NoteInstrument.values().length; instrument < NoteInstrument.values().length + midiInstruments.size(); instrument++) gnbsStruct.set("Song.Content.Instruments." + instrument, midiInstruments.get(instrument - NoteInstrument.values().length));
+			for(int instrument = defaultInstruments; instrument < defaultInstruments + midiInstruments.size(); instrument++) {
+				CustomInstrument customInstrument = midiInstruments.get(instrument - defaultInstruments);
+				String sound = customInstrument.getSound();
+				gnbsStruct.set("Song.Content.Instruments." + instrument, sound);
+				gnbsStruct.set("Song.Content.InstrumentKeys." + instrument, customInstrument.getInstrumentKey());
+				String trimmedSound = sound;
+				int idx = trimmedSound.lastIndexOf('/');
+				if(idx >= 0) trimmedSound = trimmedSound.substring(idx + 1);
+				if(!trimmedSound.contains(".")) gMusicMain.getLogger().warning("Possibly unknown custom instrument " + sound + " in song " + id);
+			}
 
 			gnbsStruct.set("Song.Content.Main", gnbsContent);
 			gnbsStruct.save(gnbsFile);

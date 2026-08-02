@@ -3,7 +3,7 @@ package dev.geco.gmusic.model;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public enum NoteInstrument {
+public enum NoteInstrument implements Instrument {
 
 	HARP(0, "block.note_block.harp"),
 	BASS(1, "block.note_block.bass"),
@@ -34,8 +34,8 @@ public enum NoteInstrument {
 		this.sound = sound;
 	}
 
-	public static @Nullable String getIdSound(int id) {
-		for(NoteInstrument noteInstrument : values()) if(noteInstrument.id == id) return noteInstrument.sound;
+	public static @Nullable NoteInstrument fromId(int id) {
+		for(NoteInstrument noteInstrument : values()) if(noteInstrument.id == id) return noteInstrument;
 		return null;
 	}
 
@@ -43,6 +43,7 @@ public enum NoteInstrument {
 		return id;
 	}
 
+	@Override
 	public @NotNull String getSound() {
 		return sound;
 	}
