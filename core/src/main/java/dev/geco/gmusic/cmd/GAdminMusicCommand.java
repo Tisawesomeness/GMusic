@@ -139,34 +139,34 @@ public class GAdminMusicCommand implements CommandExecutor {
                             gMusicMain.getMessageService().sendMessage(sender, "Messages.command-gadminmusic-download-filename-error", "%Filename%", filename);
                             return true;
                         }
-                        boolean success = downloadFile(url, file.toPath());
-                        if(success) success = gMusicMain.getSongService().loadSongFile(file);
-                        if(!success) {
-                            gMusicMain.getMessageService().sendMessage(sender, "Messages.command-gadminmusic-download-error");
-                            return true;
-                        }
-                        gMusicMain.getMessageService().sendMessage(sender, "Messages.command-gadminmusic-download", "%Filename%", filename);
+                        gMusicMain.getTaskService().run(() -> {
+                            boolean success = downloadFile(url, file.toPath());
+                            if(success) success = gMusicMain.getSongService().loadSongFile(file);
+                            if(!success) gMusicMain.getMessageService().sendMessage(sender, "Messages.command-gadminmusic-download-error");
+                            else gMusicMain.getMessageService().sendMessage(sender, "Messages.command-gadminmusic-download", "%Filename%", filename);
+                        }, false);
+                        return true;
                     }
                     case SongService.NBS_EXTENSION:
                     case SongService.MID_EXTENSION:
                     case SongService.MIDI_EXTENSION:
-                        File file = new File(gMusicMain.getDataFolder(), SongService.CONVERT_FOLDER + "/" + filename + "." + extension);
-                        if(file.exists()) {
+                        File f = new File(gMusicMain.getDataFolder(), SongService.CONVERT_FOLDER + "/" + filename + "." + extension);
+                        if(f.exists()) {
                             gMusicMain.getMessageService().sendMessage(sender, "Messages.command-gadminmusic-download-filename-error", "%Filename%", filename);
                             return true;
                         }
-                        boolean success = downloadFile(url, file.toPath());
-                        if(success) {
-                            file = gMusicMain.getSongService().convertSongFile(file);
-                            if(file == null) success = false;
-                        }
-                        if(success) success = gMusicMain.getSongService().loadSongFile(file);
-                        if(!success) {
-                            gMusicMain.getMessageService().sendMessage(sender, "Messages.command-gadminmusic-download-error");
-                            return true;
-                        }
-                        gMusicMain.getMessageService().sendMessage(sender, "Messages.command-gadminmusic-download", "%Filename%", filename);
-                        break;
+                        gMusicMain.getTaskService().run(() -> {
+                            File file = f;
+                            boolean success = downloadFile(url, file.toPath());
+                            if (success) {
+                                file = gMusicMain.getSongService().convertSongFile(file);
+                                if (file == null) success = false;
+                            }
+                            if (success) success = gMusicMain.getSongService().loadSongFile(file);
+                            if (!success) gMusicMain.getMessageService().sendMessage(sender, "Messages.command-gadminmusic-download-error");
+                            else gMusicMain.getMessageService().sendMessage(sender, "Messages.command-gadminmusic-download", "%Filename%", filename);
+                        }, false);
+                        return true;
                     default: {
                         gMusicMain.getMessageService().sendMessage(sender, "Messages.command-gadminmusic-download-type-error", "%Type%", args[1]);
                         return true;
