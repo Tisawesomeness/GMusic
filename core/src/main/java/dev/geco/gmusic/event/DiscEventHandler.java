@@ -23,6 +23,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 public class DiscEventHandler implements Listener {
@@ -68,7 +69,7 @@ public class DiscEventHandler implements Listener {
 
 			if(player.getGameMode() != GameMode.CREATIVE) item.setAmount(item.getAmount() - 1);
 
-			UUID uuid = UUID.randomUUID();
+			UUID uuid = UUID.nameUUIDFromBytes((block.getWorld().getName() + block.getX() + block.getY() + block.getZ()).getBytes(StandardCharsets.UTF_8));
 			gMusicMain.getDiscService().generateDiscPlaySettings(uuid);
 			gMusicMain.getJukeBoxService().addTemporaryJukeBoxBlock(uuid, block);
 			gMusicMain.getJukeBoxService().playBoxSong(uuid, song);
@@ -122,9 +123,10 @@ public class DiscEventHandler implements Listener {
 
 			item.setAmount(item.getAmount() - 1);
 
-			UUID uuid = UUID.randomUUID();
+			Block block = jukebox.getBlock();
+			UUID uuid = UUID.nameUUIDFromBytes((block.getWorld().getName() + block.getX() + block.getY() + block.getZ()).getBytes(StandardCharsets.UTF_8));
 			gMusicMain.getDiscService().generateDiscPlaySettings(uuid);
-			gMusicMain.getJukeBoxService().addTemporaryJukeBoxBlock(uuid, jukebox.getBlock());
+			gMusicMain.getJukeBoxService().addTemporaryJukeBoxBlock(uuid, block);
 			gMusicMain.getJukeBoxService().playBoxSong(uuid, song);
 
 			ItemStack placeholder = gMusicMain.getDiscService().createDiscPlaceholderItem(songId, uuid);
@@ -185,6 +187,7 @@ public class DiscEventHandler implements Listener {
 			}
 			gMusicMain.getJukeBoxService().removeTemporaryJukeBoxBlock(uuid);
 			gMusicMain.getJukeBoxService().stopBoxSong(uuid);
+			gMusicMain.getPlayService().removePlayState(uuid);
 			gMusicMain.getPlaySettingsService().removePlaySettingsCache(uuid);
 		} catch(IllegalArgumentException ignored) {}
 		return false;

@@ -24,10 +24,13 @@ import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.nio.charset.StandardCharsets;
 import java.sql.ResultSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
@@ -39,6 +42,7 @@ public class JukeBoxService {
 	private final NamespacedKey jukeBoxKey;
 	private final HashMap<Block, UUID> jukeBoxBlocks = new HashMap<>();
 	private final HashMap<UUID, Block> jukeBoxes = new HashMap<>();
+	private final Set<UUID> temporaryJukeBoxIds = new HashSet<>();
 	private final Random random = new Random();
 
 	public JukeBoxService(GMusicMain gMusicMain) {
@@ -70,9 +74,15 @@ public class JukeBoxService {
 
 	public @Nullable Block getJukeBoxBlock(@NotNull UUID uuid) { return jukeBoxes.get(uuid); }
 
-	public void addTemporaryJukeBoxBlock(@NotNull UUID uuid, @NotNull Block block) { jukeBoxes.put(uuid, block); }
+	public void addTemporaryJukeBoxBlock(@NotNull UUID uuid, @NotNull Block block) {
+		temporaryJukeBoxIds.add(uuid);
+		jukeBoxes.put(uuid, block);
+	}
 
-	public void removeTemporaryJukeBoxBlock(@NotNull UUID uuid) { jukeBoxes.remove(uuid); }
+	public void removeTemporaryJukeBoxBlock(@NotNull UUID uuid) {
+		temporaryJukeBoxIds.remove(uuid);
+		jukeBoxes.remove(uuid);
+	}
 
 	public void loadJukeboxes() {
 		jukeBoxBlocks.clear();
@@ -115,11 +125,16 @@ public class JukeBoxService {
 	public void unloadJukeboxes() {
 		jukeBoxBlocks.clear();
 		jukeBoxes.clear();
+		for(UUID temporaryJukeBoxId : temporaryJukeBoxIds) {
+			gMusicMain.getPlayService().removePlayState(temporaryJukeBoxId);
+			gMusicMain.getPlaySettingsService().removePlaySettingsCache(temporaryJukeBoxId);
+		}
+		temporaryJukeBoxIds.clear();
 	}
 
 	public void setJukebox(@NotNull Block block) {
 		try {
-			UUID uuid = UUID.randomUUID();
+			UUID uuid = UUID.nameUUIDFromBytes((block.getWorld().getName() + block.getX() + block.getY() + block.getZ()).getBytes(StandardCharsets.UTF_8));
 			gMusicMain.getDataService().execute("INSERT INTO gmusic_juke_box (uuid, world, x, y, z) VALUES (?, ?, ?, ?, ?)",
 					uuid.toString(),
 					block.getWorld().getName(),
@@ -182,12 +197,12 @@ public class JukeBoxService {
 			if(block != null) {
 				for(Player player : getPlayersInRange(block.getLocation().add(0.5, 0, 0.5), playSettings.getRange()).keySet()) {
 					gMusicMain.getMessageService().sendActionBarMessage(
-						player,
-						"Messages.actionbar-play",
-						"%Song%", song.getId(),
-						"%SongTitle%", song.getTitle(),
-						"%Author%", song.getAuthor().isEmpty() ? gMusicMain.getMessageService().getMessage("MusicGUI.disc-empty-author") : song.getAuthor(),
-						"%OriginalAuthor%", song.getOriginalAuthor().isEmpty() ? gMusicMain.getMessageService().getMessage("MusicGUI.disc-empty-original-author") : song.getOriginalAuthor()
+							player,
+							"Messages.actionbar-play",
+							"%Song%", song.getId(),
+							"%SongTitle%", song.getTitle(),
+							"%Author%", song.getAuthor().isEmpty() ? gMusicMain.getMessageService().getMessage("MusicGUI.disc-empty-author") : song.getAuthor(),
+							"%OriginalAuthor%", song.getOriginalAuthor().isEmpty() ? gMusicMain.getMessageService().getMessage("MusicGUI.disc-empty-original-author") : song.getOriginalAuthor()
 					);
 				}
 			}
@@ -259,12 +274,12 @@ public class JukeBoxService {
 					if(gMusicMain.getConfigService().A_SHOW_WHILE_PLAYING && ticker[0] % 2000 == 0) {
 						for(Player player : playersInRange.keySet()) {
 							gMusicMain.getMessageService().sendActionBarMessage(
-								player,
-								"Messages.actionbar-play",
-								"%Song%", song.getId(),
-								"%SongTitle%", song.getTitle(),
-								"%Author%", song.getAuthor().isEmpty() ? gMusicMain.getMessageService().getMessage("MusicGUI.disc-empty-author") : song.getAuthor(),
-								"%OriginalAuthor%", song.getOriginalAuthor().isEmpty() ? gMusicMain.getMessageService().getMessage("MusicGUI.disc-empty-original-author") : song.getOriginalAuthor()
+									player,
+									"Messages.actionbar-play",
+									"%Song%", song.getId(),
+									"%SongTitle%", song.getTitle(),
+									"%Author%", song.getAuthor().isEmpty() ? gMusicMain.getMessageService().getMessage("MusicGUI.disc-empty-author") : song.getAuthor(),
+									"%OriginalAuthor%", song.getOriginalAuthor().isEmpty() ? gMusicMain.getMessageService().getMessage("MusicGUI.disc-empty-original-author") : song.getOriginalAuthor()
 							);
 						}
 					}

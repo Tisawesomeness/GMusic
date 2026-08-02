@@ -212,10 +212,10 @@ public class GMusicMain extends JavaPlugin {
 
     private void unload() {
         dataService.close();
+        jukeBoxService.unloadJukeboxes();
+        songService.unloadSongs();
         playService.savePlayStates();
         playSettingsService.savePlaySettings();
-        songService.unloadSongs();
-        jukeBoxService.unloadJukeboxes();
 
         if(placeholderAPILink != null) placeholderAPILink.unregister();
         if(worldGuardLink != null) worldGuardLink.unregisterFlagHandlers();
