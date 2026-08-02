@@ -85,7 +85,6 @@ MusicGUI:
 
   music-options: "&cOptionen"
   music-options-volume: "&aLautstärke:&b %Volume%%"
-  music-options-join: "&aWillkommensmusik:&6 %Join%"
   music-options-play-mode-once: "&aModus:&6 Einzeln"
   music-options-play-mode-shuffle: "&aModus:&6 Shuffle"
   music-options-play-mode-repeat: "&aModus:&6 Wiederholen"

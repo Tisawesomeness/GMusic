@@ -2,8 +2,9 @@ package dev.geco.gmusic.event;
 
 import dev.geco.gmusic.GMusicMain;
 import dev.geco.gmusic.model.PlaySettings;
-import dev.geco.gmusic.model.Song;
+import dev.geco.gmusic.model.PlayState;
 import dev.geco.gmusic.model.PlayListMode;
+import dev.geco.gmusic.model.PlayType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -35,28 +36,19 @@ public class PlayerEventHandler implements Listener {
 
         if(!gMusicMain.getEnvironmentUtil().isEntityInAllowedWorld(player)) return;
 
-        PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(playerUuid);
-
+        PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(playerUuid, PlayType.DEFAULT);
         if(gMusicMain.getConfigService().R_PLAY_ON_JOIN) playSettings.setPlayListMode(PlayListMode.RADIO);
-
         if(playSettings.getPlayListMode() == PlayListMode.RADIO) gMusicMain.getRadioService().addRadioPlayer(player);
-        else if(playSettings.isPlayOnJoin()) {
-            if(gMusicMain.getPlayService().hasPlayingSong(playerUuid)) gMusicMain.getPlayService().resumeSong(player);
-            else {
-                Song song = playSettings.getCurrentSong() != null ? gMusicMain.getSongService().getSongById(playSettings.getCurrentSong()) : null;
-                long delay = playSettings.getCurrentSong() != null ? playSettings.getCurrentSongTicks() : 0;
-                playSettings.setCurrentSong(null);
-                playSettings.setCurrentSongTicks(0);
-                gMusicMain.getPlayService().playSong(player, song != null ? song : gMusicMain.getPlayService().getRandomSong(playerUuid), delay);
-            }
-        }
+
+        PlayState playState = gMusicMain.getPlayService().getPlayState(playerUuid);
+        if(playState != null && !playState.isPaused()) gMusicMain.getPlayService().playSong(player, playState.getSong(), -playState.getTickPosition());
     }
 
     @EventHandler
     public void playerChangedWorldEvent(PlayerChangedWorldEvent event) {
         Player player = event.getPlayer();
         UUID playerUuid = player.getUniqueId();
-        PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(playerUuid);
+        PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(playerUuid, PlayType.DEFAULT);
 
         if(!gMusicMain.getEnvironmentUtil().isEntityInAllowedWorld(player)) {
             gMusicMain.getPlayService().stopSong(player);
@@ -70,11 +62,20 @@ public class PlayerEventHandler implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void playerQuitEvent(PlayerQuitEvent event) {
         Player player = event.getPlayer();
+        UUID playerUuid = player.getUniqueId();
 
         gMusicMain.getRadioService().removeRadioPlayer(player);
 
-        if(gMusicMain.getConfigService().PS_SAVE_ON_QUIT) gMusicMain.getPlaySettingsService().savePlaySettings(player.getUniqueId(), gMusicMain.getPlaySettingsService().getPlaySettings(player.getUniqueId()));
-        gMusicMain.getPlaySettingsService().removePlaySettingsCache(player.getUniqueId());
+        if(gMusicMain.getConfigService().PS_SAVE_ON_QUIT) {
+            PlayState playState = gMusicMain.getPlayService().getPlayState(playerUuid);
+            if(playState != null) gMusicMain.getPlayService().savePlaySettings(playerUuid, playState);
+
+            PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(playerUuid, PlayType.DEFAULT);
+            gMusicMain.getPlaySettingsService().savePlaySettings(playerUuid, playSettings);
+        }
+
+        gMusicMain.getPlayService().removePlayState(playerUuid);
+        gMusicMain.getPlaySettingsService().removePlaySettingsCache(playerUuid);
     }
 
 }

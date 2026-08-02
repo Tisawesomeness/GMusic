@@ -10,7 +10,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.logging.Level;
 
 public class DataService {
@@ -81,6 +80,10 @@ public class DataService {
         return null;
     }
 
+    public String getType() {
+        return this.type;
+    }
+
     public void execute(String query, Object... parameters) throws SQLException {
         ensureConnection();
         try(PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -94,13 +97,6 @@ public class DataService {
         PreparedStatement preparedStatement = connection.prepareStatement(query);
         for(int i = 1; i <= parameters.length; i++) preparedStatement.setObject(i, parameters[i - 1]);
         return preparedStatement.executeQuery();
-    }
-
-    public boolean hasColumn(String table, String column) throws SQLException {
-        try(Statement stmt = connection.createStatement(); ResultSet rs = stmt.executeQuery("PRAGMA table_info(" + table + ")")) {
-            while (rs.next()) if (column.equalsIgnoreCase(rs.getString("name"))) return true;
-            return false;
-        }
     }
 
     private void ensureConnection() throws SQLException {

@@ -185,8 +185,11 @@ public class GMusicMain extends JavaPlugin {
     private void loadSettings(CommandSender sender) {
         if(!connectDatabase(sender)) return;
         songService.loadSongs();
+        playService.createDataTables();
         playSettingsService.createDataTables();
         jukeBoxService.createDataTables();
+        playService.loadPlayStates();
+        playSettingsService.loadPlaySettings();
         jukeBoxService.loadJukeboxes(null);
         if(configService.R_ACTIVE) radioService.startRadio();
     }

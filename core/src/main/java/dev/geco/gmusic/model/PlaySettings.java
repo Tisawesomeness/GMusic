@@ -1,56 +1,54 @@
 package dev.geco.gmusic.model;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 import java.util.UUID;
 
 public class PlaySettings {
 
-	private final UUID uuid;
-	private PlayListMode playlistMode;
+	private final @NotNull UUID uuid;
+	private final @NotNull PlayType playType;
+	private @NotNull PlayListMode playlistMode;
 	private int volume;
-	private boolean playOnJoin;
-	private PlayMode playMode;
+	private @NotNull PlayMode playMode;
 	private boolean showParticles;
 	private boolean reverseMode;
 	private boolean toggleMode;
 	private long range;
-	private String currentSong;
-	private long currentSongTicks;
-	private List<Song> favorites;
+	private @NotNull List<Song> favorites;
 
 	public PlaySettings(
-			UUID uuid,
-			PlayListMode playlistMode,
+			@NotNull UUID uuid,
+			@NotNull PlayType playType,
+			@NotNull PlayListMode playlistMode,
 			int volume,
-			boolean playOnJoin,
-			PlayMode playMode,
+			@NotNull PlayMode playMode,
 			boolean showParticles,
 			boolean reverseMode,
 			boolean toggleMode,
 			long range,
-			String currentSong,
-			long currentSongTicks,
-			List<Song> favorites
+			@NotNull List<Song> favorites
 	) {
 		this.uuid = uuid;
+		this.playType = playType;
 		this.playlistMode = playlistMode;
 		this.volume = volume;
-		this.playOnJoin = playOnJoin;
 		this.playMode = playMode;
 		this.showParticles = showParticles;
 		this.reverseMode = reverseMode;
 		this.toggleMode = toggleMode;
 		this.range = range;
-		this.currentSong = currentSong;
-		this.currentSongTicks = currentSongTicks;
 		this.favorites = favorites;
 	}
 
-	public UUID getUUID() { return uuid; }
+	public @NotNull UUID getUUID() { return uuid; }
 
-	public PlayListMode getPlayListMode() { return playlistMode; }
+	public @NotNull PlayType getPlayType() { return playType; }
 
-	public void setPlayListMode(PlayListMode playlistMode) { this.playlistMode = playlistMode; }
+	public @NotNull PlayListMode getPlayListMode() { return playlistMode; }
+
+	public void setPlayListMode(@NotNull PlayListMode playlistMode) { this.playlistMode = playlistMode; }
 
 	public int getVolume() { return volume; }
 
@@ -58,13 +56,9 @@ public class PlaySettings {
 
 	public void setVolume(int volume) { this.volume = volume; }
 
-	public boolean isPlayOnJoin() { return playOnJoin; }
+	public @NotNull PlayMode getPlayMode() { return playMode; }
 
-	public void setPlayOnJoin(boolean playOnJoin) { this.playOnJoin = playOnJoin; }
-
-	public PlayMode getPlayMode() { return playMode; }
-
-	public void setPlayMode(PlayMode playMode) { this.playMode = playMode; }
+	public void setPlayMode(@NotNull PlayMode playMode) { this.playMode = playMode; }
 
 	public boolean isShowingParticles() { return showParticles; }
 
@@ -82,20 +76,12 @@ public class PlaySettings {
 
 	public void setRange(long range) { this.range = range; }
 
-	public String getCurrentSong() { return currentSong; }
+	public @NotNull List<Song> getFavorites() { return favorites; }
 
-	public void setCurrentSong(String currentSong) { this.currentSong = currentSong; }
+	public void setFavorites(@NotNull List<Song> favorites) { this.favorites = favorites; }
 
-	public long getCurrentSongTicks() { return currentSongTicks; }
+	public void addFavoriteSong(@NotNull Song song) { favorites.add(song); }
 
-	public void setCurrentSongTicks(long currentSongTicks) { this.currentSongTicks = currentSongTicks; }
-
-	public List<Song> getFavorites() { return favorites; }
-
-	public void setFavorites(List<Song> favorites) { this.favorites = favorites; }
-
-	public void addFavoriteSong(Song song) { favorites.add(song); }
-
-	public void removeFavoriteSong(Song song) { favorites.remove(song); }
+	public void removeFavoriteSong(@NotNull Song song) { favorites.remove(song); }
 
 }

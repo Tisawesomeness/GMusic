@@ -3,6 +3,7 @@ package dev.geco.gmusic.service;
 import dev.geco.gmusic.GMusicMain;
 import dev.geco.gmusic.model.PlayMode;
 import dev.geco.gmusic.model.PlaySettings;
+import dev.geco.gmusic.model.PlayType;
 import dev.geco.gmusic.model.Song;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -62,7 +63,7 @@ public class DiscService {
 	}
 
 	public void generateDiscPlaySettings(@NotNull UUID uuid) {
-		PlaySettings playSettings = gMusicMain.getPlaySettingsService().generateDefaultPlaySettings(uuid);
+		PlaySettings playSettings = gMusicMain.getPlaySettingsService().generateDefaultPlaySettings(uuid, PlayType.JUKEBOX);
 		playSettings.setRange(gMusicMain.getConfigService().J_RANGE);
 		playSettings.setPlayMode(PlayMode.DEFAULT);
 		playSettings.setShowParticles(true);

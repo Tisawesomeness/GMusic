@@ -3,6 +3,7 @@ package dev.geco.gmusic.link;
 import dev.geco.gmusic.GMusicMain;
 import dev.geco.gmusic.model.PlaySettings;
 import dev.geco.gmusic.model.PlayState;
+import dev.geco.gmusic.model.PlayType;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +38,6 @@ public class PlaceholderAPILink extends PlaceholderExpansion {
     public @NotNull List<String> getPlaceholders() {
         return Arrays.asList(
             "option_volume",
-            "option_join",
             "option_playmode",
             "option_particles",
             "option_reverse",
@@ -61,27 +61,23 @@ public class PlaceholderAPILink extends PlaceholderExpansion {
 
         switch(placeholder.toLowerCase()) {
             case "option_volume" -> {
-                PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(offlinePlayer.getUniqueId());
+                PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(offlinePlayer.getUniqueId(), PlayType.DEFAULT);
                 return "" + playSettings.getVolume();
             }
-            case "option_join" -> {
-                PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(offlinePlayer.getUniqueId());
-                return "" + playSettings.isPlayOnJoin();
-            }
             case "option_playmode" -> {
-                PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(offlinePlayer.getUniqueId());
+                PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(offlinePlayer.getUniqueId(), PlayType.DEFAULT);
                 return playSettings.getPlayMode().toString();
             }
             case "option_particles" -> {
-                PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(offlinePlayer.getUniqueId());
+                PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(offlinePlayer.getUniqueId(), PlayType.DEFAULT);
                 return "" + playSettings.isShowingParticles();
             }
             case "option_reverse" -> {
-                PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(offlinePlayer.getUniqueId());
+                PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(offlinePlayer.getUniqueId(), PlayType.DEFAULT);
                 return "" + playSettings.isReverseMode();
             }
             case "option_toggle" -> {
-                PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(offlinePlayer.getUniqueId());
+                PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(offlinePlayer.getUniqueId(), PlayType.DEFAULT);
                 return "" + playSettings.isToggleMode();
             }
             case "playing" -> {

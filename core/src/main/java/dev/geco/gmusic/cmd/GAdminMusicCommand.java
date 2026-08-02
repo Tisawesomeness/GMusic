@@ -2,6 +2,7 @@ package dev.geco.gmusic.cmd;
 
 import dev.geco.gmusic.GMusicMain;
 import dev.geco.gmusic.model.PlaySettings;
+import dev.geco.gmusic.model.PlayType;
 import dev.geco.gmusic.model.Song;
 import dev.geco.gmusic.model.gui.MusicGUI;
 import dev.geco.gmusic.service.RadioService;
@@ -159,12 +160,12 @@ public class GAdminMusicCommand implements CommandExecutor {
                         gMusicMain.getTaskService().run(() -> {
                             File file = f;
                             boolean success = downloadFile(url, file.toPath());
-                            if (success) {
+                            if(success) {
                                 file = gMusicMain.getSongService().convertSongFile(file);
-                                if (file == null) success = false;
+                                if(file == null) success = false;
                             }
-                            if (success) success = gMusicMain.getSongService().loadSongFile(file);
-                            if (!success) gMusicMain.getMessageService().sendMessage(sender, "Messages.command-gadminmusic-download-error");
+                            if(success) success = gMusicMain.getSongService().loadSongFile(file);
+                            if(!success) gMusicMain.getMessageService().sendMessage(sender, "Messages.command-gadminmusic-download-error");
                             else gMusicMain.getMessageService().sendMessage(sender, "Messages.command-gadminmusic-download", "%Filename%", filename);
                         }, false);
                         return true;
@@ -351,7 +352,7 @@ public class GAdminMusicCommand implements CommandExecutor {
                     gMusicMain.getMessageService().sendMessage(sender, "Messages.command-gadminmusic-target-error", "%Target%", args[1]);
                     return true;
                 }
-                Song song = gMusicMain.getPlayService().getRandomSong(target.getUniqueId());
+                Song song = gMusicMain.getPlayService().getRandomSong(target.getUniqueId(), PlayType.DEFAULT);
                 if(song == null) {
                     gMusicMain.getMessageService().sendMessage(sender, "Messages.command-gadminmusic-no-song-error");
                     return true;
@@ -458,7 +459,7 @@ public class GAdminMusicCommand implements CommandExecutor {
                     gMusicMain.getMessageService().sendMessage(sender, "Messages.command-gadminmusic-target-error", "%Target%", args[1]);
                     return true;
                 }
-                PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(target.getUniqueId());
+                PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(target.getUniqueId(), PlayType.DEFAULT);
                 playSettings.setToggleMode(!playSettings.isToggleMode());
             }
             default -> gMusicMain.getMessageService().sendMessage(sender, "Messages.command-gadminmusic-use-error");

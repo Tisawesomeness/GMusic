@@ -1,6 +1,7 @@
 package dev.geco.gmusic.cmd;
 
 import dev.geco.gmusic.GMusicMain;
+import dev.geco.gmusic.model.PlayType;
 import dev.geco.gmusic.model.gui.MusicGUI;
 import dev.geco.gmusic.model.PlaySettings;
 import dev.geco.gmusic.model.Song;
@@ -36,7 +37,7 @@ public class GMusicCommand implements CommandExecutor {
         }
 
         if(args.length == 0) {
-            MusicGUI musicGUI = new MusicGUI(player.getUniqueId(), MusicGUI.MenuType.DEFAULT);
+            MusicGUI musicGUI = new MusicGUI(player.getUniqueId(), PlayType.DEFAULT);
             player.openInventory(musicGUI.getInventory());
             return true;
         }
@@ -76,7 +77,7 @@ public class GMusicCommand implements CommandExecutor {
                     gMusicMain.getMessageService().sendMessage(sender, "Messages.command-permission-error");
                     return true;
                 }
-                Song song = gMusicMain.getPlayService().getRandomSong(player.getUniqueId());
+                Song song = gMusicMain.getPlayService().getRandomSong(player.getUniqueId(), PlayType.DEFAULT);
                 if(song == null) {
                     gMusicMain.getMessageService().sendMessage(sender, "Messages.command-gmusic-no-song-error");
                     return true;
@@ -138,7 +139,7 @@ public class GMusicCommand implements CommandExecutor {
                     gMusicMain.getMessageService().sendMessage(sender, "Messages.command-permission-error");
                     return true;
                 }
-                PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(player.getUniqueId());
+                PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(player.getUniqueId(), PlayType.DEFAULT);
                 playSettings.setToggleMode(!playSettings.isToggleMode());
                 if(playSettings.isToggleMode()) {
                     gMusicMain.getMessageService().sendMessage(sender, "Messages.command-gmusic-toggle-disabled");
