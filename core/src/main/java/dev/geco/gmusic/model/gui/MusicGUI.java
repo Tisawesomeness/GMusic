@@ -26,13 +26,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import dev.geco.gmusic.GMusicMain;
+import org.bukkit.util.ChatPaginator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 
 public class MusicGUI {
@@ -44,6 +42,7 @@ public class MusicGUI {
 	private static final int SHIFT_VOLUME_STEPS = 1;
 	private static final long RANGE_STEPS = 1;
 	private static final long SHIFT_RANGE_STEPS = 10;
+	private static final int DESCRIPTION_MAX_LINE_LENGTH = 80;
 	private final UUID uuid;
 	private final MenuType type;
 	private final Inventory inventory;
@@ -479,6 +478,7 @@ public class MusicGUI {
 			songs = playSettings.getPlayListMode() == PlayListMode.FAVORITES ? playSettings.getFavorites() : gMusicMain.getSongService().getSongs();
 			if(searchKey != null && !searchKey.isEmpty()) songs = gMusicMain.getSongService().filterSongsBySearch(songs, searchKey);
 		}
+		songs.sort(Comparator.comparing(Song::getTitle));
 
 		if(newPage > getMaxPageSize(songs.size())) newPage = getMaxPageSize(songs.size());
 		if(newPage < 1) newPage = 1;
@@ -502,7 +502,11 @@ public class MusicGUI {
 						"%OriginalAuthor%", song.getOriginalAuthor().isEmpty() ? gMusicMain.getMessageService().getMessage("MusicGUI.disc-empty-original-author") : song.getOriginalAuthor()
 				));
 				List<String> description = new ArrayList<>();
-				for(String descriptionRow : song.getDescription()) description.add(gMusicMain.getMessageService().toFormattedMessage("&6" + descriptionRow));
+				for(String descriptionRow : song.getDescription()) {
+					for(String descriptionLine : ChatPaginator.wordWrap(descriptionRow, DESCRIPTION_MAX_LINE_LENGTH)) {
+						description.add(gMusicMain.getMessageService().toFormattedMessage("&6" + descriptionLine));
+					}
+				}
 				if(playSettings.getFavorites().contains(song)) description.add(gMusicMain.getMessageService().getMessage("MusicGUI.disc-favorite"));
 				itemMeta.setLore(description);
 				pageSongs.put(songPosition % 45, song);
