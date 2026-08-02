@@ -30,7 +30,11 @@ import org.bukkit.util.ChatPaginator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 
 public class MusicGUI {
@@ -259,9 +263,10 @@ public class MusicGUI {
 							}
 						} else {
 							if(type != MenuType.JUKEBOX) return;
+							if(gMusicMain.getConfigService().J_LOCATIONAL_SOUNDS) return;
 							long range = playSettings.getRange();
 							long step = click == ClickType.SHIFT_LEFT || click == ClickType.SHIFT_RIGHT ? SHIFT_RANGE_STEPS : RANGE_STEPS;
-							long newRange = click == ClickType.MIDDLE ? gMusicMain.getConfigService().JUKEBOX_RANGE : (click == ClickType.RIGHT ? Math.max(range - step, 0) : Math.min(range + step, gMusicMain.getConfigService().MAX_JUKEBOX_RANGE));
+							long newRange = click == ClickType.MIDDLE ? gMusicMain.getConfigService().J_RANGE : (click == ClickType.RIGHT ? Math.max(range - step, 0) : Math.min(range + step, gMusicMain.getConfigService().J_MAX_RANGE));
 							playSettings.setRange(newRange);
 							itemMeta.setDisplayName(gMusicMain.getMessageService().getMessage("MusicGUI.music-options-range", "%Range%", "" + newRange));
 						}
@@ -347,7 +352,14 @@ public class MusicGUI {
 		ItemStack itemStack;
 		ItemMeta itemMeta;
 
-		if(!gMusicMain.getConfigService().G_DISABLE_RANDOM_SONG && playSettings.getPlayListMode() != PlayListMode.RADIO) {
+		List<Song> songs = new ArrayList<>();
+
+		if(playSettings.getPlayListMode() != PlayListMode.RADIO) {
+			songs = playSettings.getPlayListMode() == PlayListMode.FAVORITES ? playSettings.getFavorites() : gMusicMain.getSongService().getSongs();
+			if(searchKey != null && !searchKey.isEmpty()) songs = gMusicMain.getSongService().filterSongsBySearch(songs, searchKey);
+		}
+
+		if(!gMusicMain.getConfigService().G_DISABLE_RANDOM_SONG && playSettings.getPlayListMode() != PlayListMode.RADIO && !songs.isEmpty()) {
 			itemStack = new ItemStack(Material.ENDER_PEARL);
 			itemMeta = itemStack.getItemMeta();
 			itemMeta.setDisplayName(gMusicMain.getMessageService().getMessage("MusicGUI.music-random"));
@@ -371,7 +383,7 @@ public class MusicGUI {
 			inventory.setItem(50, itemStack);
 		}
 
-		if(!gMusicMain.getConfigService().G_DISABLE_SEARCH && playSettings.getPlayListMode() != PlayListMode.RADIO && gMusicMain.getVersionService().isAvailable()) {
+		if(!gMusicMain.getConfigService().G_DISABLE_SEARCH && playSettings.getPlayListMode() != PlayListMode.RADIO && !songs.isEmpty() && gMusicMain.getVersionService().isAvailable()) {
 			itemStack = new ItemStack(Material.OAK_SIGN);
 			itemMeta = itemStack.getItemMeta();
 			itemMeta.setDisplayName(searchKey == null || searchKey.isEmpty() ? gMusicMain.getMessageService().getMessage("MusicGUI.music-search-none") : gMusicMain.getMessageService().getMessage("MusicGUI.music-search", "%Search%", searchKey));
@@ -462,7 +474,7 @@ public class MusicGUI {
 			inventory.setItem(50, itemStack);
 		}
 
-		if(type == MenuType.JUKEBOX) {
+		if(type == MenuType.JUKEBOX && !gMusicMain.getConfigService().J_LOCATIONAL_SOUNDS) {
 			itemStack = new ItemStack(Material.REDSTONE);
 			itemMeta = itemStack.getItemMeta();
 			itemMeta.setDisplayName(gMusicMain.getMessageService().getMessage("MusicGUI.music-options-range", "%Range%", "" + playSettings.getRange()));
@@ -477,8 +489,8 @@ public class MusicGUI {
 		if(playSettings.getPlayListMode() != PlayListMode.RADIO) {
 			songs = playSettings.getPlayListMode() == PlayListMode.FAVORITES ? playSettings.getFavorites() : gMusicMain.getSongService().getSongs();
 			if(searchKey != null && !searchKey.isEmpty()) songs = gMusicMain.getSongService().filterSongsBySearch(songs, searchKey);
+			songs.sort(Comparator.comparing(Song::getTitle));
 		}
-		songs.sort(Comparator.comparing(Song::getTitle));
 
 		if(newPage > getMaxPageSize(songs.size())) newPage = getMaxPageSize(songs.size());
 		if(newPage < 1) newPage = 1;

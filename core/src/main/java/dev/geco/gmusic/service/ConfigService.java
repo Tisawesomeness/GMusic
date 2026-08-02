@@ -19,8 +19,9 @@ public class ConfigService {
     public boolean CHECK_FOR_UPDATE;
     public boolean S_EXTENDED_RANGE;
     public boolean S_FORCE_RESOURCES;
-    public int JUKEBOX_RANGE;
-    public int MAX_JUKEBOX_RANGE;
+    public boolean J_LOCATIONAL_SOUNDS;
+    public int J_RANGE;
+    public int J_MAX_RANGE;
     public boolean A_SHOW_MESSAGES;
     public boolean A_SHOW_WHILE_PLAYING;
     public boolean R_ACTIVE;
@@ -81,8 +82,9 @@ public class ConfigService {
         S_EXTENDED_RANGE = gMusicMain.getConfig().getBoolean("Options.Sound.extened-range", true);
         S_FORCE_RESOURCES = gMusicMain.getConfig().getBoolean("Options.Sound.force-resources", true);
 
-        JUKEBOX_RANGE = gMusicMain.getConfig().getInt("Options.jukebox-range", 50);
-        MAX_JUKEBOX_RANGE = gMusicMain.getConfig().getInt("Options.max-jukebox-range", 500);
+        J_LOCATIONAL_SOUNDS = gMusicMain.getConfig().getBoolean("Options.JukeBox.locational-sounds", true);
+        J_RANGE = gMusicMain.getConfig().getInt("Options.JukeBox.range", 50);
+        J_MAX_RANGE = gMusicMain.getConfig().getInt("Options.JukeBox.max-range", 500);
 
         A_SHOW_MESSAGES = gMusicMain.getConfig().getBoolean("Options.ActionBar.show-messages", true);
         A_SHOW_WHILE_PLAYING = gMusicMain.getConfig().getBoolean("Options.ActionBar.show-while-playing", true);

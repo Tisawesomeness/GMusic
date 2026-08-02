@@ -16,11 +16,15 @@ Options:
     # Defines whether the resource pack should be automatically downloaded and applied to the user
     force-resources: true
 
-  # Defines the range a player can hear the sound of a jukebox
-  jukebox-range: 50
+  JukeBox:
+    # Defines whether a jukebox should play music at the jukebox's location
+    locational-sounds: true
 
-  # Defines the max range of a jukebox
-  max-jukebox-range: 500
+    # Defines the range a player can hear the sound of a jukebox
+    range: 50
+
+    # Defines the max range of a jukebox
+    max-range: 500
 
   ActionBar:
     # Defines whether there should be actionbar messages

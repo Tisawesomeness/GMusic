@@ -14,8 +14,10 @@ public class CustomInstrument implements Instrument {
 
     @Override
     public @NotNull String getSound() { return sound; }
+
     @Override
     public int getInstrumentKey() { return key; }
+
     @Override
     public boolean isCustom() { return true; }
 

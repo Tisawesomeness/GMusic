@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 public class SongService {
 
@@ -34,7 +35,7 @@ public class SongService {
 
     public @Nullable Song getSongById(@NotNull String song) { return songs.get(song.toLowerCase()); }
 
-    public List<Song> filterSongsBySearch(@NotNull List<Song> songs, @NotNull String search) { return songs.stream().filter(song -> song.getTitle().toLowerCase().contains(search.toLowerCase())).toList(); }
+    public List<Song> filterSongsBySearch(@NotNull List<Song> songs, @NotNull String search) { return songs.stream().filter(song -> song.getTitle().toLowerCase().contains(search.toLowerCase())).collect(Collectors.toList()); }
 
     public void loadSongs() {
         unloadSongs();

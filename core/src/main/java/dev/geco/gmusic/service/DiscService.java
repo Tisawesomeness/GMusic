@@ -63,7 +63,7 @@ public class DiscService {
 
 	public void generateDiscPlaySettings(@NotNull UUID uuid) {
 		PlaySettings playSettings = gMusicMain.getPlaySettingsService().generateDefaultPlaySettings(uuid);
-		playSettings.setRange(gMusicMain.getConfigService().JUKEBOX_RANGE);
+		playSettings.setRange(gMusicMain.getConfigService().J_RANGE);
 		playSettings.setPlayMode(PlayMode.DEFAULT);
 		playSettings.setShowParticles(true);
 	}

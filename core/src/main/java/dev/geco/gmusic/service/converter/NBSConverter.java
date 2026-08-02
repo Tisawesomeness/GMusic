@@ -165,7 +165,7 @@ public class NBSConverter {
 				String trimmedSound = sound;
 				int idx = trimmedSound.lastIndexOf('/');
 				if(idx >= 0) trimmedSound = trimmedSound.substring(idx + 1);
-				if(!trimmedSound.contains(".")) gMusicMain.getLogger().warning("Possibly unknown custom instrument " + sound + " in song " + id);
+				if(!trimmedSound.contains(".")) gMusicMain.getLogger().warning("Possibly unknown custom instrument '" + sound + "' in song '" + id + "'");
 			}
 
 			gnbsStruct.set("Song.Content.Main", gnbsContent);
