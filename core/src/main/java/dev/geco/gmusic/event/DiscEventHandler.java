@@ -70,7 +70,7 @@ public class DiscEventHandler implements Listener {
 			if(player.getGameMode() != GameMode.CREATIVE) item.setAmount(item.getAmount() - 1);
 
 			UUID uuid = UUID.nameUUIDFromBytes((block.getWorld().getName() + block.getX() + block.getY() + block.getZ()).getBytes(StandardCharsets.UTF_8));
-			gMusicMain.getDiscService().generateDiscPlaySettings(uuid);
+			gMusicMain.getDiscService().generateDiscPlaySettings(uuid, song);
 			gMusicMain.getJukeBoxService().addTemporaryJukeBoxBlock(uuid, block);
 			gMusicMain.getJukeBoxService().playBoxSong(uuid, song);
 
@@ -125,7 +125,7 @@ public class DiscEventHandler implements Listener {
 
 			Block block = jukebox.getBlock();
 			UUID uuid = UUID.nameUUIDFromBytes((block.getWorld().getName() + block.getX() + block.getY() + block.getZ()).getBytes(StandardCharsets.UTF_8));
-			gMusicMain.getDiscService().generateDiscPlaySettings(uuid);
+			gMusicMain.getDiscService().generateDiscPlaySettings(uuid, song);
 			gMusicMain.getJukeBoxService().addTemporaryJukeBoxBlock(uuid, block);
 			gMusicMain.getJukeBoxService().playBoxSong(uuid, song);
 

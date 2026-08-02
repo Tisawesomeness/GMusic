@@ -126,6 +126,8 @@ public class JukeBoxService {
 		jukeBoxBlocks.clear();
 		jukeBoxes.clear();
 		for(UUID temporaryJukeBoxId : temporaryJukeBoxIds) {
+			PlayState playState = gMusicMain.getPlayService().getPlayState(temporaryJukeBoxId);
+			if(playState != null) playState.getTimer().cancel();
 			gMusicMain.getPlayService().removePlayState(temporaryJukeBoxId);
 			gMusicMain.getPlaySettingsService().removePlaySettingsCache(temporaryJukeBoxId);
 		}
