@@ -15,6 +15,7 @@ public class PlaySettings {
 	private boolean toggleMode;
 	private long range;
 	private String currentSong;
+	private long currentSongTicks;
 	private List<Song> favorites;
 
 	public PlaySettings(
@@ -28,6 +29,7 @@ public class PlaySettings {
 			boolean toggleMode,
 			long range,
 			String currentSong,
+			long currentSongTicks,
 			List<Song> favorites
 	) {
 		this.uuid = uuid;
@@ -40,6 +42,7 @@ public class PlaySettings {
 		this.toggleMode = toggleMode;
 		this.range = range;
 		this.currentSong = currentSong;
+		this.currentSongTicks = currentSongTicks;
 		this.favorites = favorites;
 	}
 
@@ -82,6 +85,10 @@ public class PlaySettings {
 	public String getCurrentSong() { return currentSong; }
 
 	public void setCurrentSong(String currentSong) { this.currentSong = currentSong; }
+
+	public long getCurrentSongTicks() { return currentSongTicks; }
+
+	public void setCurrentSongTicks(long currentSongTicks) { this.currentSongTicks = currentSongTicks; }
 
 	public List<Song> getFavorites() { return favorites; }
 

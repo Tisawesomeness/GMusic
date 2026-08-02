@@ -73,7 +73,7 @@ public class JukeBoxService {
 
 	public void removeTemporaryJukeBoxBlock(@NotNull UUID uuid) { jukeBoxes.remove(uuid); }
 
-	public void loadJukeboxes(@NotNull World world) {
+	public void loadJukeboxes(@Nullable World world) {
 		jukeBoxBlocks.clear();
 		jukeBoxes.clear();
 		gMusicMain.getTaskService().runDelayed(() -> {
@@ -103,7 +103,10 @@ public class JukeBoxService {
 							if(gMusicMain.getPlayService().hasPlayingSong(uuid)) resumeBoxSong(uuid);
 							else {
 								Song song = playSettings.getCurrentSong() != null ? gMusicMain.getSongService().getSongById(playSettings.getCurrentSong()) : null;
-								playBoxSong(uuid, song != null ? song : gMusicMain.getPlayService().getRandomSong(uuid));
+								long delay = playSettings.getCurrentSong() != null ? playSettings.getCurrentSongTicks() : 0;
+								playSettings.setCurrentSong(null);
+								playSettings.setCurrentSongTicks(0);
+								playBoxSong(uuid, song != null ? song : gMusicMain.getPlayService().getRandomSong(uuid), delay);
 							}
 						}
 
@@ -153,7 +156,7 @@ public class JukeBoxService {
 			for(Player player : location.getWorld().getPlayers()) {
 				double distance = location.distance(player.getLocation());
 				PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(player.getUniqueId());
-				if(playSettings != null && distance <= range && !playSettings.isToggleMode()) playerRangeMap.put(player, distance);
+				if(distance <= range && !playSettings.isToggleMode()) playerRangeMap.put(player, distance);
 			}
 		} catch(Throwable ignored) { }
 		return playerRangeMap;
@@ -161,7 +164,7 @@ public class JukeBoxService {
 
 	public void playBoxSong(@NotNull UUID uuid, @Nullable Song song) { playBoxSong(uuid, song, 0); }
 
-	private void playBoxSong(@NotNull UUID uuid, @Nullable Song song, long delay) {
+	public void playBoxSong(@NotNull UUID uuid, @Nullable Song song, long delay) {
 		if(song == null) return;
 
 		PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(uuid);
@@ -304,10 +307,10 @@ public class JukeBoxService {
 		playState.getTimer().cancel();
 		playState.setPaused(true);
 
-		PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(uuid);
-		if(gMusicMain.getConfigService().A_SHOW_MESSAGES && playSettings != null) {
+		if(gMusicMain.getConfigService().A_SHOW_MESSAGES) {
 			Block block = jukeBoxes.get(uuid);
 			if(block != null) {
+				PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(uuid);
 				for(Player player : getPlayersInRange(block.getLocation().add(0.5, 0, 0.5), playSettings.getRange()).keySet()) {
 					gMusicMain.getMessageService().sendActionBarMessage(player, "Messages.actionbar-pause");
 				}
@@ -322,10 +325,10 @@ public class JukeBoxService {
 		playState.setTimer(new Timer());
 		playState.setPaused(false);
 
-		PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(uuid);
-		if(gMusicMain.getConfigService().A_SHOW_MESSAGES && playSettings != null) {
+		if(gMusicMain.getConfigService().A_SHOW_MESSAGES) {
 			Block block = jukeBoxes.get(uuid);
 			if(block != null) {
+				PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(uuid);
 				for(Player player : getPlayersInRange(block.getLocation().add(0.5, 0, 0.5), playSettings.getRange()).keySet()) {
 					gMusicMain.getMessageService().sendActionBarMessage(player, "Messages.actionbar-resume");
 				}

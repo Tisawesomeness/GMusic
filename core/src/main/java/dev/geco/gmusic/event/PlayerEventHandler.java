@@ -44,7 +44,10 @@ public class PlayerEventHandler implements Listener {
             if(gMusicMain.getPlayService().hasPlayingSong(playerUuid)) gMusicMain.getPlayService().resumeSong(player);
             else {
                 Song song = playSettings.getCurrentSong() != null ? gMusicMain.getSongService().getSongById(playSettings.getCurrentSong()) : null;
-                gMusicMain.getPlayService().playSong(player, song != null ? song : gMusicMain.getPlayService().getRandomSong(playerUuid));
+                long delay = playSettings.getCurrentSong() != null ? playSettings.getCurrentSongTicks() : 0;
+                playSettings.setCurrentSong(null);
+                playSettings.setCurrentSongTicks(0);
+                gMusicMain.getPlayService().playSong(player, song != null ? song : gMusicMain.getPlayService().getRandomSong(playerUuid), delay);
             }
         }
     }

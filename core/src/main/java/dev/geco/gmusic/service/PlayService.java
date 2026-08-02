@@ -35,7 +35,7 @@ public class PlayService {
 
 	public void playSong(@NotNull Player player, @Nullable Song song) { playSong(player, song, 0); }
 
-	private void playSong(@NotNull Player player, @Nullable Song song, long delay) {
+	public void playSong(@NotNull Player player, @Nullable Song song, long delay) {
 		if(song == null) return;
 
 		PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(player.getUniqueId());
@@ -47,8 +47,6 @@ public class PlayService {
 		Timer timer = new Timer();
 		playState = new PlayState(song, timer, playSettings.isReverseMode() ? song.getLength() + delay : -delay);
 		setPlayState(player.getUniqueId(), playState);
-
-		playSettings.setCurrentSong(song.getId());
 
 		if(gMusicMain.getConfigService().A_SHOW_MESSAGES) {
 			gMusicMain.getMessageService().sendActionBarMessage(
@@ -171,7 +169,8 @@ public class PlayService {
 			playState.getValue().getTimer().cancel();
 
 			PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(playState.getKey());
-			playSettings.setCurrentSong(null);
+			playSettings.setCurrentSong(playState.getValue().getSong().getId());
+			playSettings.setCurrentSongTicks(playState.getValue().getTickPosition());
 
 			Player player = Bukkit.getPlayer(playState.getKey());
 			if(player != null && gMusicMain.getConfigService().A_SHOW_MESSAGES) gMusicMain.getMessageService().sendActionBarMessage(player, "Messages.actionbar-stop");
@@ -187,9 +186,6 @@ public class PlayService {
 		playState.getTimer().cancel();
 
 		playStates.remove(player.getUniqueId());
-
-		PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(player.getUniqueId());
-		playSettings.setCurrentSong(null);
 
 		if(gMusicMain.getConfigService().A_SHOW_MESSAGES) gMusicMain.getMessageService().sendActionBarMessage(player, "Messages.actionbar-stop");
 	}

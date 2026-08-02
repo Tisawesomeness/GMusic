@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,9 +29,10 @@ import java.util.UUID;
 
 public class RadioService {
 
+	public static final UUID RADIO_UUID = UUID.nameUUIDFromBytes(GMusicMain.NAME.getBytes(StandardCharsets.UTF_8));
+
 	private final GMusicMain gMusicMain;
 	private final Random random = new Random();
-	private UUID radioUUID;
 	private final Set<Player> radioPlayers = new HashSet<>();
 	private final HashMap<UUID, Block> radioJukeBoxBlocks = new HashMap<>();
 
@@ -41,7 +43,6 @@ public class RadioService {
 	public void startRadio() {
 		radioPlayers.clear();
 		radioJukeBoxBlocks.clear();
-		radioUUID = UUID.randomUUID();
 
 		for(Player player : Bukkit.getOnlinePlayers()) {
 			PlaySettings playerPlaySettings = gMusicMain.getPlaySettingsService().getPlaySettings(player.getUniqueId());
@@ -50,28 +51,29 @@ public class RadioService {
 			}
 		}
 
-		playSong(gMusicMain.getPlayService().getRandomSong(radioUUID), 0);
+		PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(RADIO_UUID);
+		Song song = playSettings.getCurrentSong() != null ? gMusicMain.getSongService().getSongById(playSettings.getCurrentSong()) : null;
+		long delay = playSettings.getCurrentSong() != null ? playSettings.getCurrentSongTicks() : 0;
+		playSettings.setCurrentSong(null);
+		playSettings.setCurrentSongTicks(0);
+		playSong(song != null ? song : gMusicMain.getPlayService().getRandomSong(RADIO_UUID), delay);
 
-		new MusicGUI(radioUUID, MusicGUI.MenuType.RADIO);
+		new MusicGUI(RADIO_UUID, MusicGUI.MenuType.RADIO);
 	}
-
-	public @NotNull UUID getRadioUUID() { return radioUUID; }
 
 	public void playSong(@Nullable Song song) { playSong(song, 0); }
 
 	public void playSong(@Nullable Song song, long delay) {
 		if(song == null) return;
 
-		PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(radioUUID);
+		PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(RADIO_UUID);
 
-		PlayState playState = gMusicMain.getPlayService().getPlayState(radioUUID);
+		PlayState playState = gMusicMain.getPlayService().getPlayState(RADIO_UUID);
 		if(playState != null) playState.getTimer().cancel();
 
 		Timer timer = new Timer();
 		playState = new PlayState(song, timer, playSettings.isReverseMode() ? song.getLength() + delay : -delay);
-		gMusicMain.getPlayService().setPlayState(radioUUID, playState);
-
-		playSettings.setCurrentSong(song.getId());
+		gMusicMain.getPlayService().setPlayState(RADIO_UUID, playState);
 
 		if(gMusicMain.getConfigService().A_SHOW_MESSAGES) {
 			Set<Player> players = new HashSet<>(radioPlayers);
@@ -96,8 +98,8 @@ public class RadioService {
 	}
 
 	private void playTimer(@NotNull Song song, @NotNull Timer timer) {
-		PlayState playState = gMusicMain.getPlayService().getPlayState(radioUUID);
-		PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(radioUUID);
+		PlayState playState = gMusicMain.getPlayService().getPlayState(RADIO_UUID);
+		PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(RADIO_UUID);
 
 		final long[] ticker = {0};
 
@@ -174,7 +176,7 @@ public class RadioService {
 
 				if(position == (playSettings.isReverseMode() ? 0 : song.getLength())) {
 					timer.cancel();
-					playSong(gMusicMain.getPlayService().getShuffleSong(radioUUID, song), gMusicMain.getConfigService().PS_TIME_UNTIL_SHUFFLE);
+					playSong(gMusicMain.getPlayService().getShuffleSong(RADIO_UUID, song), gMusicMain.getConfigService().PS_TIME_UNTIL_SHUFFLE);
 				} else {
 					playState.setTickPosition(playSettings.isReverseMode() ? position - 1 : position + 1);
 					if(gMusicMain.getConfigService().A_SHOW_WHILE_PLAYING && ticker[0] % 2000 == 0) {
@@ -196,31 +198,26 @@ public class RadioService {
 	}
 
 	public void stopRadio() {
-		gMusicMain.getPlaySettingsService().removePlaySettingsCache(radioUUID);
-
-		PlayState playState = gMusicMain.getPlayService().getPlayState(radioUUID);
+		PlayState playState = gMusicMain.getPlayService().getPlayState(RADIO_UUID);
 		if(playState == null) return;
 
 		playState.getTimer().cancel();
 
-		gMusicMain.getPlayService().removePlayState(radioUUID);
+		gMusicMain.getPlayService().removePlayState(RADIO_UUID);
 	}
 
 	public Song getNextSong() {
-		PlayState playState = gMusicMain.getPlayService().getPlayState(radioUUID);
-		return playState != null ? gMusicMain.getPlayService().getShuffleSong(radioUUID, playState.getSong()) : gMusicMain.getPlayService().getRandomSong(radioUUID);
+		PlayState playState = gMusicMain.getPlayService().getPlayState(RADIO_UUID);
+		return playState != null ? gMusicMain.getPlayService().getShuffleSong(RADIO_UUID, playState.getSong()) : gMusicMain.getPlayService().getRandomSong(RADIO_UUID);
 	}
 
 	public void stopSong() {
-		PlayState playState = gMusicMain.getPlayService().getPlayState(radioUUID);
+		PlayState playState = gMusicMain.getPlayService().getPlayState(RADIO_UUID);
 		if(playState == null) return;
 
 		playState.getTimer().cancel();
 
-		gMusicMain.getPlayService().removePlayState(radioUUID);
-
-		PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(radioUUID);
-		playSettings.setCurrentSong(null);
+		gMusicMain.getPlayService().removePlayState(RADIO_UUID);
 
 		if(gMusicMain.getConfigService().A_SHOW_MESSAGES) {
 			Set<Player> players = new HashSet<>(radioPlayers);
@@ -236,14 +233,13 @@ public class RadioService {
 	}
 
 	public void pauseSong() {
-		PlayState playState = gMusicMain.getPlayService().getPlayState(radioUUID);
+		PlayState playState = gMusicMain.getPlayService().getPlayState(RADIO_UUID);
 		if(playState == null) return;
 
 		playState.getTimer().cancel();
 		playState.setPaused(true);
 
-		PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(radioUUID);
-		if(gMusicMain.getConfigService().A_SHOW_MESSAGES && playSettings != null) {
+		if(gMusicMain.getConfigService().A_SHOW_MESSAGES) {
 			Set<Player> players = new HashSet<>(radioPlayers);
 			for(Map.Entry<UUID, Block> radioJukeBox : radioJukeBoxBlocks.entrySet()) {
 				PlaySettings jukeBoxPlaySettings = gMusicMain.getPlaySettingsService().getPlaySettings(radioJukeBox.getKey());
@@ -257,14 +253,13 @@ public class RadioService {
 	}
 
 	public void resumeSong() {
-		PlayState playState = gMusicMain.getPlayService().getPlayState(radioUUID);
+		PlayState playState = gMusicMain.getPlayService().getPlayState(RADIO_UUID);
 		if(playState == null) return;
 
 		playState.setTimer(new Timer());
 		playState.setPaused(false);
 
-		PlaySettings playSettings = gMusicMain.getPlaySettingsService().getPlaySettings(radioUUID);
-		if(gMusicMain.getConfigService().A_SHOW_MESSAGES && playSettings != null) {
+		if(gMusicMain.getConfigService().A_SHOW_MESSAGES) {
 			Set<Player> players = new HashSet<>(radioPlayers);
 			for(Map.Entry<UUID, Block> radioJukeBox : radioJukeBoxBlocks.entrySet()) {
 				PlaySettings jukeBoxPlaySettings = gMusicMain.getPlaySettingsService().getPlaySettings(radioJukeBox.getKey());

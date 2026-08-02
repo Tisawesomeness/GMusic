@@ -20,10 +20,10 @@ Options:
     # Defines whether a jukebox should play music at the jukebox's location
     locational-sounds: true
 
-    # Defines the range a player can hear the sound of a jukebox
+    # Defines the range a player can hear the sound of a jukebox (Only locational-sounds: false)
     range: 50
 
-    # Defines the max range of a jukebox
+    # Defines the max range of a jukebox (Only locational-sounds: false)
     max-range: 500
 
   ActionBar:

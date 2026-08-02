@@ -179,7 +179,7 @@ public class MusicGUI {
 									gMusicMain.getJukeBoxService().playBoxSong(uuid, gMusicMain.getPlayService().getRandomSong(uuid));
 								}
 								case RADIO -> {
-									gMusicMain.getRadioService().playSong(gMusicMain.getPlayService().getRandomSong(gMusicMain.getRadioService().getRadioUUID()));
+									gMusicMain.getRadioService().playSong(gMusicMain.getPlayService().getRandomSong(uuid));
 								}
 							}
 						} else if(type != MenuType.RADIO) {
@@ -353,13 +353,14 @@ public class MusicGUI {
 		ItemMeta itemMeta;
 
 		List<Song> songs = new ArrayList<>();
+		List<Song> filteredSongs = songs;
 
 		if(playSettings.getPlayListMode() != PlayListMode.RADIO) {
 			songs = playSettings.getPlayListMode() == PlayListMode.FAVORITES ? playSettings.getFavorites() : gMusicMain.getSongService().getSongs();
-			if(searchKey != null && !searchKey.isEmpty()) songs = gMusicMain.getSongService().filterSongsBySearch(songs, searchKey);
+			if(searchKey != null && !searchKey.isEmpty()) filteredSongs = gMusicMain.getSongService().filterSongsBySearch(songs, searchKey);
 		}
 
-		if(!gMusicMain.getConfigService().G_DISABLE_RANDOM_SONG && playSettings.getPlayListMode() != PlayListMode.RADIO && !songs.isEmpty()) {
+		if(!gMusicMain.getConfigService().G_DISABLE_RANDOM_SONG && playSettings.getPlayListMode() != PlayListMode.RADIO && !filteredSongs.isEmpty()) {
 			itemStack = new ItemStack(Material.ENDER_PEARL);
 			itemMeta = itemStack.getItemMeta();
 			itemMeta.setDisplayName(gMusicMain.getMessageService().getMessage("MusicGUI.music-random"));

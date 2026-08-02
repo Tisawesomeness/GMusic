@@ -4,6 +4,7 @@ import dev.geco.gmusic.GMusicMain;
 import dev.geco.gmusic.model.PlaySettings;
 import dev.geco.gmusic.model.Song;
 import dev.geco.gmusic.model.gui.MusicGUI;
+import dev.geco.gmusic.service.RadioService;
 import dev.geco.gmusic.service.SongService;
 import org.bukkit.Bukkit;
 import org.bukkit.SoundCategory;
@@ -182,7 +183,7 @@ public class GAdminMusicCommand implements CommandExecutor {
                     gMusicMain.getMessageService().sendMessage(sender, "Messages.command-sender-error");
                     return true;
                 }
-                MusicGUI musicGUI = MusicGUI.getMusicGUI(gMusicMain.getRadioService().getRadioUUID());
+                MusicGUI musicGUI = MusicGUI.getMusicGUI(RadioService.RADIO_UUID);
                 if(musicGUI != null) player.openInventory(musicGUI.getInventory());
             }
             case "edit" -> {

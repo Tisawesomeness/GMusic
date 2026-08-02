@@ -27,8 +27,9 @@ public class PlaySettingsService {
 
 	public void createDataTables() {
 		try {
-			gMusicMain.getDataService().execute("CREATE TABLE IF NOT EXISTS gmusic_play_settings (uuid TEXT, playListMode INTEGER, volume INTEGER, playOnJoin INTEGER, playMode INTEGER, showParticles INTEGER, reverseMode INTEGER, toggleMode INTEGER, range INTEGER, currentSong TEXT);");
+			gMusicMain.getDataService().execute("CREATE TABLE IF NOT EXISTS gmusic_play_settings (uuid TEXT, playListMode INTEGER, volume INTEGER, playOnJoin INTEGER, playMode INTEGER, showParticles INTEGER, reverseMode INTEGER, toggleMode INTEGER, range INTEGER, currentSong TEXT, currentSongTicks INTEGER);");
 			gMusicMain.getDataService().execute("CREATE TABLE IF NOT EXISTS gmusic_play_settings_favorites (uuid TEXT, songId TEXT);");
+			if(!gMusicMain.getDataService().hasColumn("gmusic_play_settings", "currentSongTicks")) gMusicMain.getDataService().execute("ALTER TABLE gmusic_play_settings ADD COLUMN currentSongTicks INTEGER;");
 		} catch(Throwable e) { gMusicMain.getLogger().log(Level.SEVERE, "Could not create play settings database tables!", e); }
 	}
 
@@ -59,6 +60,7 @@ public class PlaySettingsService {
 							playSettingsData.getBoolean("toggleMode"),
 							playSettingsData.getLong("range"),
 							playSettingsData.getString("currentSong"),
+							playSettingsData.getLong("currentSongTicks"),
 							favorites
 					);
 				}
@@ -66,7 +68,7 @@ public class PlaySettingsService {
 		} catch(Throwable e) { gMusicMain.getLogger().log(Level.SEVERE, "Could not load play settings", e); }
 
 		if(playSettings == null) playSettings = generateDefaultPlaySettings(uuid);
-		else playSettingsCache.put(uuid, playSettings);
+		playSettingsCache.put(uuid, playSettings);
 
 		playSettings.setFavorites(favorites);
 
@@ -85,6 +87,7 @@ public class PlaySettingsService {
 				false,
 				0,
 				null,
+				0,
 				new ArrayList<>()
 		);
 
@@ -105,7 +108,7 @@ public class PlaySettingsService {
 
 			playSettingsCache.put(uuid, playSettings);
 
-			gMusicMain.getDataService().execute("INSERT INTO gmusic_play_settings (uuid, playListMode, volume, playOnJoin, playMode, showParticles, reverseMode, toggleMode, range, currentSong) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+			gMusicMain.getDataService().execute("INSERT INTO gmusic_play_settings (uuid, playListMode, volume, playOnJoin, playMode, showParticles, reverseMode, toggleMode, range, currentSong, currentSongTicks) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
 					uuid.toString(),
 					playSettings.getPlayListMode().getId(),
 					playSettings.getVolume(),
@@ -115,7 +118,8 @@ public class PlaySettingsService {
 					playSettings.isReverseMode(),
 					playSettings.isToggleMode(),
 					playSettings.getRange(),
-					playSettings.getCurrentSong()
+					playSettings.getCurrentSong(),
+					playSettings.getCurrentSongTicks()
 			);
 
 			if(playSettings.getFavorites().isEmpty()) return;
