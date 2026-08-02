@@ -184,7 +184,6 @@ public class MusicGUI {
 								}
 							}
 						} else {
-							if(playSettings.getPlayListMode() == PlayListMode.RADIO) return;
 							int playModeId = playSettings.getPlayMode().getId();
 							PlayMode playMode = PlayMode.byId(click == ClickType.MIDDLE ? gMusicMain.getConfigService().PS_D_PLAY_MODE : (click == ClickType.RIGHT ? (playModeId - 1 < 0 ? PlayMode.values().length - 1 : playModeId - 1) : (playModeId + 1 > PlayMode.values().length - 1 ? 0 : playModeId + 1)));
 							playSettings.setPlayMode(playMode);
@@ -192,8 +191,8 @@ public class MusicGUI {
 						}
 					}
 					case 49 -> {
-						if(playType == PlayType.RADIO) return;
 						if(!optionState) {
+							if(playType == PlayType.RADIO) return;
 							int playListModeId = playSettings.getPlayListMode().getId();
 							PlayListMode playListMode = PlayListMode.byId(click == ClickType.MIDDLE ? gMusicMain.getConfigService().PS_D_PLAYLIST_MODE : (click == ClickType.RIGHT ? (playListModeId - 1 < 0 ? PlayListMode.values().length - 1 : playListModeId - 1) : (playListModeId + 1 > PlayListMode.values().length - 1 ? 0 : playListModeId + 1)));
 							playSettings.setPlayListMode(playListMode);
@@ -351,6 +350,7 @@ public class MusicGUI {
 
 		if(playSettings.getPlayListMode() != PlayListMode.RADIO) {
 			songs = playSettings.getPlayListMode() == PlayListMode.FAVORITES ? playSettings.getFavorites() : gMusicMain.getSongService().getSongs();
+			filteredSongs = songs;
 			if(searchKey != null && !searchKey.isEmpty()) filteredSongs = gMusicMain.getSongService().filterSongsBySearch(songs, searchKey);
 		}
 
@@ -450,13 +450,11 @@ public class MusicGUI {
 		}
 
 		if(playSettings.getPlayListMode() != PlayListMode.RADIO) {
-			if(playType != PlayType.RADIO) {
-				itemStack = new ItemStack(Material.BLAZE_POWDER);
-				itemMeta = itemStack.getItemMeta();
-				itemMeta.setDisplayName(gMusicMain.getMessageService().getMessage(playSettings.getPlayMode() == PlayMode.DEFAULT ? "MusicGUI.music-options-play-mode-once" : playSettings.getPlayMode() == PlayMode.SHUFFLE ? "MusicGUI.music-options-play-mode-shuffle" : "MusicGUI.music-options-play-mode-repeat"));
-				itemStack.setItemMeta(itemMeta);
-				inventory.setItem(48, itemStack);
-			}
+			itemStack = new ItemStack(Material.BLAZE_POWDER);
+			itemMeta = itemStack.getItemMeta();
+			itemMeta.setDisplayName(gMusicMain.getMessageService().getMessage(playSettings.getPlayMode() == PlayMode.DEFAULT ? "MusicGUI.music-options-play-mode-once" : playSettings.getPlayMode() == PlayMode.SHUFFLE ? "MusicGUI.music-options-play-mode-shuffle" : "MusicGUI.music-options-play-mode-repeat"));
+			itemStack.setItemMeta(itemMeta);
+			inventory.setItem(48, itemStack);
 			itemStack = new ItemStack(Material.TOTEM_OF_UNDYING);
 			itemMeta = itemStack.getItemMeta();
 			itemMeta.setDisplayName(gMusicMain.getMessageService().getMessage("MusicGUI.music-options-reverse", "%Reverse%", gMusicMain.getMessageService().getMessage(playSettings.isReverseMode() ? "MusicGUI.music-options-true" : "MusicGUI.music-options-false")));

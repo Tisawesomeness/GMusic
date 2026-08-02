@@ -3,6 +3,7 @@ package dev.geco.gmusic.service;
 import dev.geco.gmusic.GMusicMain;
 import dev.geco.gmusic.model.NotePart;
 import dev.geco.gmusic.model.PlayListMode;
+import dev.geco.gmusic.model.PlayMode;
 import dev.geco.gmusic.model.PlaySettings;
 import dev.geco.gmusic.model.PlayState;
 import dev.geco.gmusic.model.PlayType;
@@ -174,8 +175,13 @@ public class RadioService {
 				}
 
 				if(position == (playSettings.isReverseMode() ? 0 : song.getLength())) {
-					timer.cancel();
-					playSong(gMusicMain.getPlayService().getShuffleSong(RADIO_UUID, song, PlayType.RADIO), gMusicMain.getConfigService().PS_TIME_UNTIL_SHUFFLE);
+					if(playSettings.getPlayMode() == PlayMode.LOOP) {
+						position = playSettings.isReverseMode() ? song.getLength() + gMusicMain.getConfigService().PS_TIME_UNTIL_REPEAT : -gMusicMain.getConfigService().PS_TIME_UNTIL_REPEAT;
+						playState.setTickPosition(position);
+					} else {
+						timer.cancel();
+						playSong(gMusicMain.getPlayService().getShuffleSong(RADIO_UUID, song, PlayType.RADIO), gMusicMain.getConfigService().PS_TIME_UNTIL_SHUFFLE);
+					}
 				} else {
 					playState.setTickPosition(playSettings.isReverseMode() ? position - 1 : position + 1);
 					if(gMusicMain.getConfigService().A_SHOW_WHILE_PLAYING && ticker[0] % 2000 == 0) {
