@@ -1,6 +1,7 @@
 package dev.geco.gmusic.event;
 
 import dev.geco.gmusic.model.gui.MusicGUI;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -59,25 +60,25 @@ public class JukeBoxEventHandler implements Listener {
 
 	@EventHandler (ignoreCancelled = true, priority = EventPriority.HIGHEST)
 	public void blockBreakEvent(BlockBreakEvent event) {
-		handleBlockBreak(event.getBlock());
+		handleBlockBreak(event.getBlock(), event.getPlayer().getGameMode() != GameMode.CREATIVE);
 	}
 
 	@EventHandler (ignoreCancelled = true, priority = EventPriority.HIGHEST)
 	public void blockExplodeEvent(BlockExplodeEvent event) {
-		for(Block block : event.blockList()) handleBlockBreak(block);
+		for(Block block : event.blockList()) handleBlockBreak(block, true);
 	}
 
 	@EventHandler (ignoreCancelled = true, priority = EventPriority.HIGHEST)
 	public void entityExplodeEvent(EntityExplodeEvent event) {
-		for(Block block : event.blockList()) handleBlockBreak(block);
+		for(Block block : event.blockList()) handleBlockBreak(block, true);
 	}
 
-	private void handleBlockBreak(Block block) {
+	private void handleBlockBreak(Block block, boolean dropJukebox) {
 		if(block.getType() != Material.JUKEBOX) return;
 		if(gMusicMain.getJukeBoxService().getJukeBoxId(block) == null) return;
 		gMusicMain.getJukeBoxService().removeJukebox(block);
 		block.setType(Material.AIR);
-		block.getWorld().dropItemNaturally(block.getLocation().add(0.5, 0, 0.5), gMusicMain.getJukeBoxService().createJukeBoxItem());
+		if(dropJukebox) block.getWorld().dropItemNaturally(block.getLocation().add(0.5, 0, 0.5), gMusicMain.getJukeBoxService().createJukeBoxItem());
 	}
 
 }
