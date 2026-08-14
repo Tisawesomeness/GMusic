@@ -265,6 +265,9 @@ public class MusicGUI {
 								setPage(1);
 								setDefaultBar();
 							}
+						} else if(!(playType == PlayType.JUKEBOX && gMusicMain.getConfigService().J_LOCATIONAL_SOUNDS)) {
+							playSettings.setStereo(click == ClickType.MIDDLE ? gMusicMain.getConfigService().PS_D_STEREO : !playSettings.isStereo());
+							itemMeta.setDisplayName(gMusicMain.getMessageService().getMessage("MusicGUI.music-options-stereo", "%Stereo%", gMusicMain.getMessageService().getMessage(playSettings.isStereo() ? "MusicGUI.music-options-true" : "MusicGUI.music-options-false")));
 						}
 					}
 					case 52 -> setPage(page - 1);
@@ -467,6 +470,14 @@ public class MusicGUI {
 			itemMeta.setDisplayName(gMusicMain.getMessageService().getMessage("MusicGUI.music-options-range", "%Range%", "" + playSettings.getRange()));
 			itemStack.setItemMeta(itemMeta);
 			inventory.setItem(50, itemStack);
+		}
+
+		if(!(playType == PlayType.JUKEBOX && gMusicMain.getConfigService().J_LOCATIONAL_SOUNDS)) {
+			itemStack = new ItemStack(Material.EMERALD);
+			itemMeta = itemStack.getItemMeta();
+			itemMeta.setDisplayName(gMusicMain.getMessageService().getMessage("MusicGUI.music-options-stereo", "%Stereo%", gMusicMain.getMessageService().getMessage(playSettings.isStereo() ? "MusicGUI.music-options-true" : "MusicGUI.music-options-false")));
+			itemStack.setItemMeta(itemMeta);
+			inventory.setItem(51, itemStack);
 		}
 	}
 

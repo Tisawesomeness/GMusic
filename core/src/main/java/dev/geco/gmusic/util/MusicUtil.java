@@ -20,16 +20,16 @@ public class MusicUtil {
         this.gMusicMain = gMusicMain;
     }
 
-    public void playAtPlayer(@NotNull Player player, @NotNull NotePart notePart, @NotNull PlaySettings playSettings, boolean stereo) {
-        play(player, notePart, null, playSettings.getFixedVolume(), stereo);
+    public void playAtPlayer(@NotNull Player player, @NotNull NotePart notePart, @NotNull PlaySettings playSettings) {
+        play(player, notePart, null, playSettings.getFixedVolume(), playSettings.isStereo());
     }
     public void playAtLocation(@NotNull Player player, @NotNull NotePart notePart, @NotNull Location origin, @NotNull PlaySettings playSettings) {
         float volume = rangeToVolume(playSettings.getRange()) * playSettings.getFixedVolume();
         play(player, notePart, origin, volume, false);
     }
-    public void playAtPlayerWithDecay(@NotNull Player player, @NotNull NotePart notePart, double distanceToOrigin, @NotNull PlaySettings playSettings, boolean stereo) {
+    public void playAtPlayerWithDecay(@NotNull Player player, @NotNull NotePart notePart, double distanceToOrigin, @NotNull PlaySettings playSettings) {
         float volume = simulateVolumeDecay(distanceToOrigin, playSettings.getRange()) * playSettings.getFixedVolume();
-        play(player, notePart, null, volume, stereo);
+        play(player, notePart, null, volume, playSettings.isStereo());
     }
 
     private void play(@NotNull Player player, @NotNull NotePart notePart, @Nullable Location origin, float fixedVolume, boolean stereo) {

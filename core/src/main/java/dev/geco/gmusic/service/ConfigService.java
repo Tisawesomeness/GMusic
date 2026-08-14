@@ -35,6 +35,7 @@ public class ConfigService {
     public boolean PS_SAVE_ON_QUIT;
     public int PS_D_PLAYLIST_MODE;
     public int PS_D_VOLUME;
+    public boolean PS_D_STEREO;
     public int PS_D_PLAY_MODE;
     public boolean PS_D_PARTICLES;
     public boolean PS_D_REVERSE;
@@ -101,6 +102,7 @@ public class ConfigService {
         PS_SAVE_ON_QUIT = gMusicMain.getConfig().getBoolean("Options.PlayerSettings.save-on-quit", true);
         PS_D_PLAYLIST_MODE = gMusicMain.getConfig().getInt("Options.PlayerSettings.Default.playlist-mode", 0);
         PS_D_VOLUME = gMusicMain.getConfig().getInt("Options.PlayerSettings.Default.volume", 70);
+        PS_D_STEREO = gMusicMain.getConfig().getBoolean("Options.PlayerSettings.Default.stereo", true);
         PS_D_PLAY_MODE = gMusicMain.getConfig().getInt("Options.PlayerSettings.Default.play-mode", 0);
         PS_D_PARTICLES = gMusicMain.getConfig().getBoolean("Options.PlayerSettings.Default.particles", false);
         PS_D_REVERSE = gMusicMain.getConfig().getBoolean("Options.PlayerSettings.Default.reverse", false);

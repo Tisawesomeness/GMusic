@@ -28,7 +28,7 @@ public class PlaySettingsService {
 
 	public void createDataTables() {
 		try {
-			gMusicMain.getDataService().execute("CREATE TABLE IF NOT EXISTS gmusic_play_setting (uuid CHAR(36) PRIMARY KEY, play_type INTEGER, play_list_mode INTEGER, volume INTEGER, play_mode INTEGER, show_particles INTEGER, reverse_mode INTEGER, toggle_mode INTEGER, range INTEGER);");
+			gMusicMain.getDataService().execute("CREATE TABLE IF NOT EXISTS gmusic_play_setting (uuid CHAR(36) PRIMARY KEY, play_type INTEGER, play_list_mode INTEGER, volume INTEGER, play_mode INTEGER, show_particles INTEGER, reverse_mode INTEGER, toggle_mode INTEGER, range INTEGER, stereo INTEGER);");
 			gMusicMain.getDataService().execute("CREATE TABLE IF NOT EXISTS gmusic_play_setting_favorite (uuid CHAR(36), song_id TEXT, FOREIGN KEY (uuid) REFERENCES gmusic_play_setting(uuid) ON DELETE CASCADE ON UPDATE CASCADE);");
 		} catch(Throwable e) { gMusicMain.getLogger().log(Level.SEVERE, "Could not create play settings database tables!", e); }
 	}
@@ -52,6 +52,7 @@ public class PlaySettingsService {
 							playSettingsData.getBoolean("reverse_mode"),
 							playSettingsData.getBoolean("toggle_mode"),
 							playSettingsData.getLong("range"),
+							playSettingsData.getBoolean("stereo"),
 							new ArrayList<>()
 					));
 				}
@@ -98,6 +99,7 @@ public class PlaySettingsService {
 							playSettingsData.getBoolean("reverse_mode"),
 							playSettingsData.getBoolean("toggle_mode"),
 							playSettingsData.getLong("range"),
+							playSettingsData.getBoolean("stereo"),
 							favorites
 					);
 				}
@@ -123,6 +125,7 @@ public class PlaySettingsService {
 				gMusicMain.getConfigService().PS_D_REVERSE,
 				false,
 				0,
+				gMusicMain.getConfigService().PS_D_STEREO,
 				new ArrayList<>()
 		);
 
@@ -146,9 +149,10 @@ public class PlaySettingsService {
 					show_particles,
 					reverse_mode,
 					toggle_mode,
-					range
+					range,
+					stereo
 				)
-				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 				ON CONFLICT(uuid) DO UPDATE SET
 					play_type      = excluded.play_type,
 					play_list_mode = excluded.play_list_mode,
@@ -157,7 +161,8 @@ public class PlaySettingsService {
 					show_particles = excluded.show_particles,
 					reverse_mode   = excluded.reverse_mode,
 					toggle_mode    = excluded.toggle_mode,
-					range          = excluded.range
+					range          = excluded.range,
+					stereo         = excluded.stereo
 				""";
 
 				default -> """
@@ -170,9 +175,10 @@ public class PlaySettingsService {
 					show_particles,
 					reverse_mode,
 					toggle_mode,
-					range
+					range,
+					stereo
 				)
-				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) AS new
+				VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) AS new
 				ON DUPLICATE KEY UPDATE
 					play_type      = new.play_type,
 					play_list_mode = new.play_list_mode,
@@ -181,7 +187,8 @@ public class PlaySettingsService {
 					show_particles = new.show_particles,
 					reverse_mode   = new.reverse_mode,
 					toggle_mode    = new.toggle_mode,
-					range          = new.range
+					range          = new.range,
+					stereo         = new.stereo,
 				""";
 			};
 
@@ -195,7 +202,8 @@ public class PlaySettingsService {
 					playSettings.isShowingParticles(),
 					playSettings.isReverseMode(),
 					playSettings.isToggleMode(),
-					playSettings.getRange()
+					playSettings.getRange(),
+					playSettings.isStereo()
 			);
 
 			if(playSettings.getFavorites().isEmpty()) return;
