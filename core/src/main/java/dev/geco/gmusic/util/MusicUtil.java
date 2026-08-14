@@ -4,9 +4,13 @@ import dev.geco.gmusic.GMusicMain;
 import dev.geco.gmusic.model.NotePart;
 import dev.geco.gmusic.model.PlaySettings;
 import dev.geco.gmusic.model.Song;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import org.bukkit.Location;
+import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class MusicUtil {
 
@@ -17,7 +21,7 @@ public class MusicUtil {
     }
 
     public void playAtPlayer(@NotNull Player player, @NotNull NotePart notePart, @NotNull PlaySettings playSettings, boolean stereo) {
-        play(player, notePart, player.getEyeLocation(), playSettings.getFixedVolume(), stereo);
+        play(player, notePart, null, playSettings.getFixedVolume(), stereo);
     }
     public void playAtLocation(@NotNull Player player, @NotNull NotePart notePart, @NotNull Location origin, @NotNull PlaySettings playSettings) {
         float volume = rangeToVolume(playSettings.getRange()) * playSettings.getFixedVolume();
@@ -25,22 +29,32 @@ public class MusicUtil {
     }
     public void playAtPlayerWithDecay(@NotNull Player player, @NotNull NotePart notePart, double distanceToOrigin, @NotNull PlaySettings playSettings, boolean stereo) {
         float volume = simulateVolumeDecay(distanceToOrigin, playSettings.getRange()) * playSettings.getFixedVolume();
-        play(player, notePart, player.getEyeLocation(), volume, stereo);
+        play(player, notePart, null, volume, stereo);
     }
 
-    private void play(@NotNull Player player, @NotNull NotePart notePart, @NotNull Location origin, float fixedVolume, boolean stereo) {
+    private void play(@NotNull Player player, @NotNull NotePart notePart, @Nullable Location origin, float fixedVolume, boolean stereo) {
         Song song = notePart.getNote().getSong();
         if(notePart.getSound() != null) {
-            float volume = fixedVolume * notePart.getVolume();
-
-            Location location = !stereo || notePart.getDistance() == 0 ? origin : gMusicMain.getSteroNoteUtil().convertToStero(origin, notePart.getDistance());
-
-            if(!gMusicMain.getConfigService().ENVIRONMENT_EFFECTS) player.playSound(location, notePart.getSound(), song.getSoundCategory(), volume, notePart.getPitch());
-            else {
-                if(gMusicMain.getEnvironmentUtil().isPlayerSwimming(player)) player.playSound(location, notePart.getSound(), song.getSoundCategory(), volume > 0.4f ? volume - 0.3f : volume, notePart.getPitch() - 0.15f);
-                else player.playSound(location, notePart.getSound(), song.getSoundCategory(), volume, notePart.getPitch());
+            Sound sound = getSound(player, notePart, fixedVolume);
+            if(stereo) {
+                Location originLocation = origin == null ? player.getEyeLocation() : origin;
+                Location stereoLocation = notePart.getDistance() == 0 ? originLocation : gMusicMain.getSteroNoteUtil().convertToStero(originLocation, notePart.getDistance());
+                player.playSound(stereoLocation, notePart.getSound(), song.getSoundCategory(), sound.volume(), sound.pitch());
+            } else {
+                if(origin == null) player.playSound(sound, Sound.Emitter.self());
+                else player.playSound(origin, notePart.getSound(), song.getSoundCategory(), sound.volume(), sound.pitch());
             }
         } else if(notePart.getStopSound() != null) player.stopSound(notePart.getStopSound(), song.getSoundCategory());
+    }
+
+    private Sound getSound(@NotNull Player player, @NotNull NotePart notePart, float fixedVolume) {
+        Key sound = Key.key(notePart.getSound());
+        SoundCategory category = notePart.getNote().getSong().getSoundCategory();
+        float volume = fixedVolume * notePart.getVolume();
+        if(gMusicMain.getConfigService().ENVIRONMENT_EFFECTS && gMusicMain.getEnvironmentUtil().isPlayerSwimming(player))
+            return Sound.sound(sound, category, volume > 0.4f ? volume - 0.3f : volume, notePart.getPitch() - 0.15f);
+        else
+            return Sound.sound(sound, category, volume, notePart.getPitch());
     }
 
     private float rangeToVolume(double range) {
