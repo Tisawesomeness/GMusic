@@ -242,17 +242,8 @@ public class JukeBoxService {
 
 					for(NotePart notePart : noteParts) {
 						for(Player player : playersInRange.keySet()) {
-							if(notePart.getSound() != null) {
-								float volume = (float) ((playersInRange.get(player) - playSettings.getRange()) * playSettings.getFixedVolume() / (double) -playSettings.getRange()) * notePart.getVolume();
-
-								Location location = gMusicMain.getConfigService().J_LOCATIONAL_SOUNDS ? boxLocation : notePart.getDistance() == 0 ? player.getEyeLocation() : gMusicMain.getSteroNoteUtil().convertToStero(player.getEyeLocation(), notePart.getDistance());
-
-								if(!gMusicMain.getConfigService().ENVIRONMENT_EFFECTS) player.playSound(location, notePart.getSound(), song.getSoundCategory(), volume, notePart.getPitch());
-								else {
-									if(gMusicMain.getEnvironmentUtil().isPlayerSwimming(player)) player.playSound(location, notePart.getSound(), song.getSoundCategory(), volume > 0.4f ? volume - 0.3f : volume, notePart.getPitch() - 0.15f);
-									else player.playSound(location, notePart.getSound(), song.getSoundCategory(), volume, notePart.getPitch());
-								}
-							} else if(notePart.getStopSound() != null) player.stopSound(notePart.getStopSound(), song.getSoundCategory());
+							if(gMusicMain.getConfigService().J_LOCATIONAL_SOUNDS) gMusicMain.getMusicUtil().playAtLocation(player, notePart, boxLocation, playSettings);
+							else gMusicMain.getMusicUtil().playAtPlayerWithDecay(player, notePart, playersInRange.get(player), playSettings, true);
 						}
 					}
 				}

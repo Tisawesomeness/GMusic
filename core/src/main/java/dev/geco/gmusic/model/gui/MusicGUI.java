@@ -233,7 +233,6 @@ public class MusicGUI {
 							setOptionsBar();
 						} else {
 							if(playType != PlayType.JUKEBOX) return;
-							if(gMusicMain.getConfigService().J_LOCATIONAL_SOUNDS) return;
 							long range = playSettings.getRange();
 							long step = click == ClickType.SHIFT_LEFT || click == ClickType.SHIFT_RIGHT ? SHIFT_RANGE_STEPS : RANGE_STEPS;
 							long newRange = click == ClickType.MIDDLE ? gMusicMain.getConfigService().J_RANGE : (click == ClickType.RIGHT ? Math.max(range - step, 0) : Math.min(range + step, gMusicMain.getConfigService().J_MAX_RANGE));
@@ -462,7 +461,7 @@ public class MusicGUI {
 			inventory.setItem(49, itemStack);
 		}
 
-		if(playType == PlayType.JUKEBOX && !gMusicMain.getConfigService().J_LOCATIONAL_SOUNDS) {
+		if(playType == PlayType.JUKEBOX) {
 			itemStack = new ItemStack(Material.REDSTONE);
 			itemMeta = itemStack.getItemMeta();
 			itemMeta.setDisplayName(gMusicMain.getMessageService().getMessage("MusicGUI.music-options-range", "%Range%", "" + playSettings.getRange()));

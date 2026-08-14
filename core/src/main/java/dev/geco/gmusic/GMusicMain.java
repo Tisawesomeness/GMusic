@@ -35,6 +35,7 @@ import dev.geco.gmusic.service.converter.WavConverter;
 import dev.geco.gmusic.service.message.PaperMessageService;
 import dev.geco.gmusic.service.message.SpigotMessageService;
 import dev.geco.gmusic.util.EnvironmentUtil;
+import dev.geco.gmusic.util.MusicUtil;
 import dev.geco.gmusic.util.SteroNoteUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -68,6 +69,7 @@ public class GMusicMain extends JavaPlugin {
     private WavConverter wavConverter;
     private EnvironmentUtil environmentUtil;
     private SteroNoteUtil steroNoteUtil;
+    private MusicUtil musicUtil;
     private GriefPreventionLink griefPreventionLink;
     private PlaceholderAPILink placeholderAPILink;
     private PlotSquaredLink plotSquaredLink;
@@ -115,6 +117,8 @@ public class GMusicMain extends JavaPlugin {
 
     public SteroNoteUtil getSteroNoteUtil() { return steroNoteUtil; }
 
+    public MusicUtil getMusicUtil() { return musicUtil; }
+
     public GriefPreventionLink getGriefPreventionLink() { return griefPreventionLink; }
 
     public PlaceholderAPILink getPlaceholderAPILink() { return placeholderAPILink; }
@@ -152,6 +156,7 @@ public class GMusicMain extends JavaPlugin {
 
         environmentUtil = new EnvironmentUtil(this);
         steroNoteUtil = new SteroNoteUtil();
+        musicUtil = new MusicUtil(this);
 
         loadFeatures();
 
