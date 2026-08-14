@@ -119,12 +119,12 @@ public class PlaySettingsService {
 				uuid,
 				playType,
 				PlayListMode.byId(gMusicMain.getConfigService().PS_D_PLAYLIST_MODE),
-				gMusicMain.getConfigService().PS_D_VOLUME,
+				playType == PlayType.JUKEBOX ? gMusicMain.getConfigService().J_VOLUME : gMusicMain.getConfigService().PS_D_VOLUME,
 				PlayMode.byId(gMusicMain.getConfigService().PS_D_PLAY_MODE),
 				gMusicMain.getConfigService().PS_D_PARTICLES,
 				gMusicMain.getConfigService().PS_D_REVERSE,
 				false,
-				0,
+				playType == PlayType.JUKEBOX ? gMusicMain.getConfigService().J_RANGE : 0,
 				gMusicMain.getConfigService().PS_D_STEREO,
 				new ArrayList<>()
 		);

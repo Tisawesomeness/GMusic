@@ -22,6 +22,7 @@ public class ConfigService {
     public boolean J_LOCATIONAL_SOUNDS;
     public int J_RANGE;
     public int J_MAX_RANGE;
+    public int J_VOLUME;
     public boolean A_SHOW_MESSAGES;
     public boolean A_SHOW_WHILE_PLAYING;
     public boolean R_ACTIVE;
@@ -85,6 +86,7 @@ public class ConfigService {
         J_LOCATIONAL_SOUNDS = gMusicMain.getConfig().getBoolean("Options.JukeBox.locational-sounds", true);
         J_RANGE = gMusicMain.getConfig().getInt("Options.JukeBox.range", 50);
         J_MAX_RANGE = gMusicMain.getConfig().getInt("Options.JukeBox.max-range", 500);
+        J_VOLUME = gMusicMain.getConfig().getInt("Options.JukeBox.volume", 100);
 
         A_SHOW_MESSAGES = gMusicMain.getConfig().getBoolean("Options.ActionBar.show-messages", true);
         A_SHOW_WHILE_PLAYING = gMusicMain.getConfig().getBoolean("Options.ActionBar.show-while-playing", true);

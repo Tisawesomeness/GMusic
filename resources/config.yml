@@ -26,6 +26,9 @@ Options:
     # Defines the max range of a jukebox
     max-range: 500
 
+    # Defines the default volume of a jukebox
+    volume: 100
+
   ActionBar:
     # Defines whether there should be actionbar messages
     show-messages: true

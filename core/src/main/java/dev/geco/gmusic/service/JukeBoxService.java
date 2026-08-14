@@ -145,7 +145,6 @@ public class JukeBoxService {
 					block.getZ()
 			);
 			PlaySettings playSettings = gMusicMain.getPlaySettingsService().generateDefaultPlaySettings(uuid, PlayType.JUKEBOX);
-			playSettings.setRange(gMusicMain.getConfigService().J_RANGE);
 			if(playSettings.getPlayListMode() == PlayListMode.RADIO) gMusicMain.getRadioService().addRadioJukeBox(uuid, block);
 			jukeBoxBlocks.put(block, uuid);
 			jukeBoxes.put(uuid, block);

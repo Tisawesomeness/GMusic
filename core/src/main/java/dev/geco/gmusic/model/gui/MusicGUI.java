@@ -385,7 +385,7 @@ public class MusicGUI {
 			button = new Button(item, (itemMeta, click, clicker) -> {
                 int volumn = playSettings.getVolume();
                 int step = click == ClickType.SHIFT_LEFT || click == ClickType.SHIFT_RIGHT ? SHIFT_VOLUME_STEPS : VOLUME_STEPS;
-                int newVolumn = click == ClickType.MIDDLE ? gMusicMain.getConfigService().PS_D_VOLUME : (click == ClickType.RIGHT ? Math.max(volumn - step, 0) : Math.min(volumn + step, 100));
+				int newVolumn = click == ClickType.MIDDLE ? (playType == PlayType.JUKEBOX ? gMusicMain.getConfigService().J_VOLUME : gMusicMain.getConfigService().PS_D_VOLUME) : (click == ClickType.RIGHT ? Math.max(volumn - step, 0) : Math.min(volumn + step, 100));
                 playSettings.setVolume(newVolumn);
                 itemMeta.setDisplayName(gMusicMain.getMessageService().getMessage("MusicGUI.music-options-volume", "%Volume%", "" + newVolumn));
             });
