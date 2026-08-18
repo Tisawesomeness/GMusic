@@ -9,10 +9,13 @@ import net.kyori.adventure.sound.Sound;
 import org.bukkit.Location;
 import org.bukkit.SoundCategory;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class MusicUtil {
+
+    private static final double SIMULATED_RANGE_CAP = 8.0;
 
     private final GMusicMain gMusicMain;
 
@@ -24,8 +27,13 @@ public class MusicUtil {
         play(player, notePart, null, playSettings.getFixedVolume(), playSettings.isStereo());
     }
     public void playAtLocation(@NotNull Player player, @NotNull NotePart notePart, @NotNull Location origin, @NotNull PlaySettings playSettings) {
-        float volume = rangeToVolume(playSettings.getRange()) * playSettings.getFixedVolume();
-        play(player, notePart, origin, volume, false);
+        if(gMusicMain.getConfigService().J_LOCATIONAL_CLOSE_TO_PLAYER) {
+            Location playAt = moveTowardsOrigin(player.getEyeLocation(), origin);
+            play(player, notePart, playAt, playSettings.getFixedVolume(), false);
+        } else {
+            float volume = rangeToVolume(playSettings.getRange()) * playSettings.getFixedVolume();
+            play(player, notePart, origin, volume, false);
+        }
     }
     public void playAtPlayerWithDecay(@NotNull Player player, @NotNull NotePart notePart, double distanceToOrigin, @NotNull PlaySettings playSettings) {
         float volume = simulateVolumeDecay(distanceToOrigin, playSettings.getRange()) * playSettings.getFixedVolume();
@@ -57,6 +65,12 @@ public class MusicUtil {
             return Sound.sound(sound, category, volume, notePart.getPitch());
     }
 
+    private Location moveTowardsOrigin(Location listener, Location origin) {
+        Vector listenerToOrigin = origin.toVector().subtract(listener.toVector());
+        double lengthSqr = listenerToOrigin.lengthSquared();
+        if(lengthSqr <= SIMULATED_RANGE_CAP * SIMULATED_RANGE_CAP) return origin;
+        return listener.clone().add(listenerToOrigin.normalize().multiply(SIMULATED_RANGE_CAP));
+    }
     private float rangeToVolume(double range) {
         return (float) (1.0 + (range - 16) * 0.06);
     }

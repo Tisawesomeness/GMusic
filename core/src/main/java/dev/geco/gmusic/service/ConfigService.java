@@ -20,6 +20,7 @@ public class ConfigService {
     public boolean S_EXTENDED_RANGE;
     public boolean S_FORCE_RESOURCES;
     public boolean J_LOCATIONAL_SOUNDS;
+    public boolean J_LOCATIONAL_CLOSE_TO_PLAYER;
     public int J_RANGE;
     public int J_MAX_RANGE;
     public int J_VOLUME;
@@ -84,6 +85,7 @@ public class ConfigService {
         S_FORCE_RESOURCES = gMusicMain.getConfig().getBoolean("Options.Sound.force-resources", true);
 
         J_LOCATIONAL_SOUNDS = gMusicMain.getConfig().getBoolean("Options.JukeBox.locational-sounds", true);
+        J_LOCATIONAL_CLOSE_TO_PLAYER = gMusicMain.getConfig().getBoolean("Options.JukeBox.locational-close-to-player", true);
         J_RANGE = gMusicMain.getConfig().getInt("Options.JukeBox.range", 50);
         J_MAX_RANGE = gMusicMain.getConfig().getInt("Options.JukeBox.max-range", 500);
         J_VOLUME = gMusicMain.getConfig().getInt("Options.JukeBox.volume", 100);
