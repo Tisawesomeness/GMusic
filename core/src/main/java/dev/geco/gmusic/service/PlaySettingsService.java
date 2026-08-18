@@ -57,6 +57,8 @@ public class PlaySettingsService {
 					);
 				}
 			}
+
+			gMusicMain.getDataService().execute("DROP TABLE gmusic_play_settings");
 		}
 
 		if(tableExists("gmusic_play_settings_favorites")) {
@@ -79,7 +81,6 @@ public class PlaySettingsService {
 					uuidExistsInNewSettings = rs.next();
 				}
 
-				// Only migrate favorites if UUID does NOT exist in new settings table
 				if(!uuidExistsInNewSettings) {
 					for(String songId : songIds) {
 						gMusicMain.getDataService().execute(
@@ -90,6 +91,8 @@ public class PlaySettingsService {
 					}
 				}
 			}
+
+			gMusicMain.getDataService().execute("DROP TABLE gmusic_play_settings_favorites");
 		}
 	}
 
