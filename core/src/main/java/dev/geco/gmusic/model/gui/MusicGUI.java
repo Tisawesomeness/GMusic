@@ -189,8 +189,6 @@ public class MusicGUI {
 			if(searchKey != null && !searchKey.isEmpty()) filteredSongs = gMusicMain.getSongService().filterSongsBySearch(songs, searchKey);
 		}
 
-		List<Button> buttonsToAdd = new ArrayList<>();
-
 		if(!gMusicMain.getConfigService().G_DISABLE_RANDOM_SONG && playSettings.getPlayListMode() != PlayListMode.RADIO && !filteredSongs.isEmpty()) {
 			item = makeItem(Material.ENDER_PEARL, gMusicMain.getMessageService().getMessage("MusicGUI.music-random"));
 			Button button = new Button(item, (itemMeta, click, clicker) -> {
@@ -208,7 +206,7 @@ public class MusicGUI {
 					}
 				}
 			});
-			buttonsToAdd.add(button);
+			setButton(48, button);
 		}
 
 		if(!gMusicMain.getConfigService().G_DISABLE_PLAYLIST && playType != PlayType.RADIO) {
@@ -244,7 +242,7 @@ public class MusicGUI {
 				}
 				setDefaultBar();
 			});
-			buttonsToAdd.add(button);
+			setButton(49, button);
 		}
 
 		if(!gMusicMain.getConfigService().G_DISABLE_OPTIONS) {
@@ -252,7 +250,7 @@ public class MusicGUI {
 			Button button = new Button(item, (itemMeta, click, clicker) -> {
 				setOptionsBar();
 			});
-			buttonsToAdd.add(button);
+			setButton(50, button);
 		}
 
 		if(!gMusicMain.getConfigService().G_DISABLE_SEARCH && playSettings.getPlayListMode() != PlayListMode.RADIO && !songs.isEmpty() && gMusicMain.getVersionService().isAvailable()) {
@@ -277,14 +275,7 @@ public class MusicGUI {
 					setDefaultBar();
 				}
 			});
-			buttonsToAdd.add(button);
-		}
-
-		for(int i = 0; i < buttonsToAdd.size(); i++) {
-			int slot = 48 + i;
-			if(slot >= 52) break;
-			Button button = buttonsToAdd.get(i);
-			setButton(slot, button);
+			setButton(51, button);
 		}
 
 		setPauseResumeBar();
